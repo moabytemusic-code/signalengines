@@ -1,0 +1,78 @@
+{
+    "engine_id": "fbadban",
+    "engine_name": "Facebook Ad Account Recovery Engine",
+    "subdomain": "fbadban",
+    "primary_keyword": "facebook ad account disabled",
+    "secondary_keywords": [
+        "facebook ad account restricted",
+        "appeal facebook ad ban"
+    ],
+    "seo": {
+        "title": "Facebook Ad Account Disabled? Free Scan + Recovery Steps",
+        "description": "Run a quick scan to identify likely causes, get do/don’t steps, and generate an appeal template.",
+        "h1": "Facebook Ad Account Disabled? Scan It Now"
+    },
+    "inputs": [
+        {
+            "id": "status",
+            "type": "select",
+            "label": "Account status",
+            "options": [
+                "Restricted",
+                "Disabled",
+                "Ads Rejected Only"
+            ],
+            "required": true
+        },
+        {
+            "id": "business_type",
+            "type": "select",
+            "label": "Business type",
+            "options": [
+                "Ecom",
+                "Affiliate",
+                "Local",
+                "Info Product"
+            ],
+            "required": true
+        },
+        {
+            "id": "ad_copy",
+            "type": "textarea",
+            "label": "Paste your ad copy (optional)",
+            "required": false
+        }
+    ],
+    "scoring_rules": [
+        {
+            "id": "risk_phrases",
+            "type": "keyword_match",
+            "field": "ad_copy",
+            "keywords": [
+                "guaranteed",
+                "lose weight fast",
+                "before and after"
+            ],
+            "score": 25
+        }
+    ],
+    "free_output_sections": [
+        "risk_score",
+        "likely_causes",
+        "first_5_steps"
+    ],
+    "paid_output_sections": [
+        "appeal_template",
+        "prevention_checklist",
+        "backup_account_structure"
+    ],
+    "pricing": {
+        "emergency": 7,
+        "full": 27,
+        "monthly": 29
+    },
+    "cross_sell_engines": [
+        "emailspam",
+        "paymentfreeze"
+    ]
+}

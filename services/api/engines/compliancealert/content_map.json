@@ -1,0 +1,56 @@
+{
+    "engine_id": "compliancealert",
+    "problem": "compliance warning fix",
+    "variants": [
+        "gdpr warning",
+        "dmca takedown",
+        "policy violation notice",
+        "copyright claim"
+    ],
+    "personas": [
+        "affiliate marketer",
+        "creator",
+        "small business",
+        "agency"
+    ],
+    "causes": [
+        "missing privacy policy/terms/refund disclosures",
+        "copyrighted media use without rights",
+        "misleading claims in marketing",
+        "cookie/consent issues (where applicable)",
+        "platform policy violations (ads, content, landing pages)"
+    ],
+    "immediate_actions": [
+        "identify the exact warning type and deadline",
+        "remove or correct the offending content immediately",
+        "add/repair core policy pages and disclosures",
+        "document changes and prepare a concise response",
+        "implement a compliance checklist to prevent repeat issues"
+    ],
+    "mistakes": [
+        "ignoring the notice or delaying action",
+        "sending emotional replies without proof of remediation",
+        "reposting removed content elsewhere",
+        "using unlicensed images/video/music",
+        "continuing to run ads to non-compliant pages"
+    ],
+    "prevention": [
+        "maintain policy pages and update quarterly",
+        "use licensed media and keep proof of rights",
+        "avoid unsubstantiated claims (health/wealth guarantees)",
+        "standardize a pre-launch compliance checklist",
+        "train team on platform policy basics"
+    ],
+    "faqs": [
+        "What should I do first after a DMCA notice?",
+        "What disclosures do marketing pages need?",
+        "How do I avoid copyright problems?",
+        "Can non-compliant pages cause ad bans?",
+        "How do I build a simple compliance process?"
+    ],
+    "related_engines": [
+        "fbadban",
+        "sitehacked",
+        "paymentfreeze"
+    ]
+}

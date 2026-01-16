@@ -1,0 +1,51 @@
+{
+    "engine_id": "compliancealert",
+    "engine_name": "Compliance Alert Engine",
+    "subdomain": "compliancealert",
+    "primary_keyword": "gdpr compliance warning",
+    "secondary_keywords": [
+        "dmca takedown notice"
+    ],
+    "seo": {
+        "title": "Compliance Warning? Fix It Before You’re Shut Down",
+        "description": "Scan your compliance risk and get a fix plan.",
+        "h1": "Compliance Alert? Act Now"
+    },
+    "inputs": [
+        {
+            "id": "alert_type",
+            "type": "select",
+            "label": "Alert received",
+            "options": [
+                "GDPR",
+                "DMCA",
+                "Platform Policy"
+            ],
+            "required": true
+        }
+    ],
+    "scoring_rules": [
+        {
+            "id": "default",
+            "score": 60,
+            "message": "Compliance Risk Detected"
+        }
+    ],
+    "free_output_sections": [
+        "risk_level",
+        "common_violations",
+        "immediate_steps"
+    ],
+    "paid_output_sections": [
+        "fix_templates",
+        "compliance_checklist"
+    ],
+    "pricing": {
+        "emergency": 7,
+        "full": 27,
+        "monthly": 29
+    },
+    "cross_sell_engines": [
+        "sitehacked"
+    ]
+}

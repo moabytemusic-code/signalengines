@@ -1,0 +1,55 @@
+{
+    "engine_id": "chargebackalert",
+    "problem": "chargeback spike",
+    "variants": [
+        "too many chargebacks",
+        "dispute rate increase",
+        "chargeback threshold exceeded",
+        "high dispute ratio"
+    ],
+    "personas": [
+        "ecommerce seller",
+        "subscription business",
+        "digital product creator",
+        "saas founder"
+    ],
+    "causes": [
+        "billing descriptor confusion",
+        "shipping delays or unclear delivery terms",
+        "poor customer support response times",
+        "fraudulent transactions",
+        "misaligned expectations from ads"
+    ],
+    "immediate_actions": [
+        "identify dispute reason codes",
+        "pause high-risk traffic sources",
+        "improve refund handling immediately",
+        "update descriptors and customer communication",
+        "respond to open disputes with evidence"
+    ],
+    "mistakes": [
+        "ignoring early dispute warnings",
+        "fighting every chargeback blindly",
+        "no visible refund or contact options",
+        "continuing ads with high dispute rates",
+        "inconsistent billing descriptors"
+    ],
+    "prevention": [
+        "set up proactive refund workflows",
+        "clarify product expectations pre-purchase",
+        "monitor dispute ratios weekly",
+        "use fraud detection tools",
+        "train support on rapid resolution"
+    ],
+    "faqs": [
+        "What chargeback rate is too high?",
+        "Why did my dispute rate spike suddenly?",
+        "How do chargebacks affect processors?",
+        "Should I refund instead of fighting disputes?",
+        "How do I reduce chargebacks long term?"
+    ],
+    "related_engines": [
+        "paymentfreeze",
+        "adbleed"
+    ]
+}

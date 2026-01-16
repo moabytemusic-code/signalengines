@@ -1,0 +1,54 @@
+{
+    "engine_id": "reviewrepair",
+    "problem": "google reviews repair",
+    "variants": [
+        "remove fake google reviews",
+        "google review spam",
+        "rating dropped suddenly",
+        "negative review response"
+    ],
+    "personas": [
+        "local business owner",
+        "multi-location business",
+        "agency managing reputation"
+    ],
+    "causes": [
+        "competitor or spam attacks",
+        "service failure and unresolved complaints",
+        "review gating or incentive violations",
+        "lack of review generation system",
+        "poor response handling escalating issues"
+    ],
+    "immediate_actions": [
+        "identify fake vs legitimate reviews",
+        "flag policy-violating reviews with evidence",
+        "respond calmly to legitimate negatives with resolution offer",
+        "launch a compliant review request campaign to recent customers",
+        "fix the operational root cause behind complaints"
+    ],
+    "mistakes": [
+        "arguing publicly with reviewers",
+        "requesting reviews in a non-compliant way",
+        "copy-paste responses that look automated",
+        "ignoring reviews for weeks",
+        "trying to buy reviews"
+    ],
+    "prevention": [
+        "create a steady, compliant review request system",
+        "respond within 24–48 hours",
+        "train staff on customer recovery scripts",
+        "track complaint themes and fix upstream issues",
+        "use photos/posts to strengthen profile trust"
+    ],
+    "faqs": [
+        "Can I remove fake Google reviews?",
+        "What responses help recover trust fastest?",
+        "How many new reviews does it take to raise my rating?",
+        "What review practices violate Google’s policies?",
+        "How quickly should I respond to negative reviews?"
+    ],
+    "related_engines": [
+        "gbpsuspend",
+        "compliancealert"
+    ]
+}

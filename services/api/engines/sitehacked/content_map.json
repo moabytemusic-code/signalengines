@@ -1,0 +1,56 @@
+{
+    "engine_id": "sitehacked",
+    "problem": "website hacked malware recovery",
+    "variants": [
+        "wordpress hacked",
+        "malware warning",
+        "site redirect hack",
+        "unknown admin user"
+    ],
+    "personas": [
+        "site owner",
+        "ecommerce store",
+        "local business",
+        "affiliate marketer"
+    ],
+    "causes": [
+        "outdated plugins/themes/core",
+        "weak admin credentials or reused passwords",
+        "compromised hosting or insecure permissions",
+        "infected plugin/theme downloads",
+        "unpatched vulnerabilities and no WAF"
+    ],
+    "immediate_actions": [
+        "take a full backup (even if infected) for forensics",
+        "change passwords and rotate keys",
+        "remove unknown admin users and suspicious plugins",
+        "scan and clean files; restore from known-good backup if available",
+        "apply updates + add firewall protection"
+    ],
+    "mistakes": [
+        "cleaning without closing the vulnerability first",
+        "restoring backup without patching root cause",
+        "ignoring Google Search Console security warnings",
+        "keeping unused plugins/themes installed",
+        "no monitoring or firewall"
+    ],
+    "prevention": [
+        "weekly update cadence + vulnerability monitoring",
+        "WAF + brute-force protection",
+        "least-privilege admin roles",
+        "daily backups + restore drills",
+        "file integrity monitoring"
+    ],
+    "faqs": [
+        "How do I know if my site is hacked?",
+        "Should I restore from backup or clean manually?",
+        "How do I remove the Google malware warning?",
+        "What are the most common WordPress attack vectors?",
+        "How do I prevent reinfection?"
+    ],
+    "related_engines": [
+        "paymentfreeze",
+        "emailspam",
+        "compliancealert"
+    ]
+}

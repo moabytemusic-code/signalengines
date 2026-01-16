@@ -1,0 +1,55 @@
+{
+    "engine_id": "merchantsuspend",
+    "problem": "google merchant center suspended",
+    "variants": [
+        "merchant center account suspended",
+        "misrepresentation suspension",
+        "shopping ads disapproved",
+        "merchant account deactivated"
+    ],
+    "personas": [
+        "ecommerce owner",
+        "dropshipper",
+        "brand store",
+        "agency managing shopping ads"
+    ],
+    "causes": [
+        "misrepresentation of products or pricing",
+        "policy violations in product feeds",
+        "website trust issues (contact, returns, policies)",
+        "sudden feed or pricing changes",
+        "repeat disapprovals ignored"
+    ],
+    "immediate_actions": [
+        "identify the exact suspension reason in Merchant Center",
+        "audit website policies and contact details",
+        "fix product feed issues and inaccurate claims",
+        "document all changes clearly",
+        "submit a single reinstatement request"
+    ],
+    "mistakes": [
+        "resubmitting without fixing site issues",
+        "changing feeds repeatedly during review",
+        "unclear shipping and refund information",
+        "using misleading pricing or promotions",
+        "running ads to non-compliant pages"
+    ],
+    "prevention": [
+        "maintain clear and visible policy pages",
+        "keep product data accurate and up to date",
+        "monitor feed diagnostics weekly",
+        "avoid aggressive promotional language",
+        "log all compliance changes"
+    ],
+    "faqs": [
+        "Why was my Merchant Center account suspended?",
+        "What is misrepresentation in Merchant Center?",
+        "How long does reinstatement take?",
+        "What website policies are required?",
+        "How do I prevent future suspensions?"
+    ],
+    "related_engines": [
+        "paymentfreeze",
+        "compliancealert"
+    ]
+}

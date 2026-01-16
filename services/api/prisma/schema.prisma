@@ -1,0 +1,219 @@
+// This schema is for SignalEngines Phase D
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  // Auth
+  magicLinkToken String?   @unique
+  tokenExpiresAt DateTime?
+
+  // Sessions
+  sessions      Session[]
+
+  // Relations
+  engineRuns    EngineRun[]
+  events        Event[]
+  purchases     Purchase[]
+  subscription  Subscription?
+
+  // Entitlements
+  entitlement   Entitlement?
+  engineEntitlements EngineEntitlement[]
+  hasAgencyAccess Boolean @default(false)
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  token     String   @unique // The cookie value
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model EngineRun {
+  id            String   @id @default(cuid())
+  engineId      String
+  
+  // Who ran it?
+  userId        String?
+  anonymousId   String?  // Needed for tracking anonymous users
+  // outputId field removed, relation is managed on EngineOutput side
+  
+  inputs        String
+  status        String   // STARTED, COMPLETED, FAILED
+  
+  createdAt     DateTime @default(now())
+
+  user          User?    @relation(fields: [userId], references: [id])
+  output        EngineOutput?
+}
+
+model EngineOutput {
+  id            String   @id @default(cuid())
+  runId         String   @unique
+  
+  freeOutput    String
+  paidOutput    String?    // Null if not generated, or stored but gated
+  
+  createdAt     DateTime @default(now())
+  
+  run           EngineRun?   @relation(fields: [runId], references: [id])
+}
+
+model EmailCapture {
+  id            String   @id @default(cuid())
+  email         String
+  engineId      String?
+  source        String?  // UTM source
+  createdAt     DateTime @default(now())
+}
+
+model Event {
+  id            String   @id @default(cuid())
+  type          String   // page_view, scan_started, etc
+  engineId      String?
+  userId        String?
+  anonymousId   String?
+  meta          String?
+  
+  createdAt     DateTime @default(now())
+  
+  user          User?    @relation(fields: [userId], references: [id])
+}
+
+// Billing Models
+
+model Purchase {
+  id                     String   @id @default(cuid())
+  userId                 String
+  engineId               String?
+  stripePriceId          String
+  stripePaymentIntentId  String?
+  amount                 Int
+  status                 String
+  createdAt              DateTime @default(now())
+  
+  user                   User     @relation(fields: [userId], references: [id])
+}
+
+model Subscription {
+  id                     String   @id @default(cuid())
+  userId                 String   @unique
+  stripeCustomerId       String
+  stripeSubscriptionId   String   @unique
+  status                 String
+  currentPeriodEnd       DateTime
+  
+  user                   User     @relation(fields: [userId], references: [id])
+}
+
+model Entitlement {
+  userId          String  @id
+  isPremium       Boolean @default(false)
+  maxRunsPerDay   Int     @default(3)
+  templatesAccess Boolean @default(false)
+  updatedAt       DateTime @updatedAt
+  
+  user            User    @relation(fields: [userId], references: [id])
+}
+
+model EngineEntitlement {
+  id        String  @id @default(cuid())
+  userId    String
+  engineId  String
+  hasAccess Boolean @default(true)
+  
+  user      User    @relation(fields: [userId], references: [id])
+  
+  @@unique([userId, engineId])
+}
+
+
+model EngineDefinition {
+  engineId      String   @id
+  engineJson    String   // Store as stringified JSON
+  contentMapJson String  // Store as stringified JSON
+  status        String   @default("active") // active, draft, archived
+  createdBy     String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model SeoGenerationJob {
+  id          String   @id @default(cuid())
+  engineId    String
+  mode        String
+  dryRun      Boolean  @default(true)
+  overwrite   Boolean  @default(false)
+  status      String   // PENDING, COMPLETED, FAILED
+  resultJson  String   // JSON string of generated previews or validation results
+  createdBy   String?
+  createdAt   DateTime @default(now())
+}
+
+model SeoPage {
+  id          String   @id @default(cuid())
+  engineId    String
+  slug        String
+  title       String
+  description String
+  markdown    String   // The content
+  schemaJson  String   // For structured data
+  published   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@unique([engineId, slug])
+}
+
+model SeoSchedule {
+  id            String   @id @default(cuid())
+  engineId      String   @unique // One schedule per engine for now
+  frequency     String   @default("weekly") // daily, weekly
+  dayOfWeek     Int      @default(1) // 0=Sun, 1=Mon...
+  hour          Int      @default(9) // 0-23
+  timezone      String   @default("UTC")
+  mode          String   @default("weekly_pack_v1")
+  pagesPerRun   Int      @default(1)
+  autoPublish   Boolean  @default(true)
+  dryRun        Boolean  @default(false) // If true, generate but dont publish
+  isEnabled     Boolean  @default(true)
+  
+  lastRunAt     DateTime?
+  nextRunAt     DateTime?
+  
+  createdBy     String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  runs          SeoScheduleRun[]
+}
+
+model SeoScheduleRun {
+  id             String   @id @default(cuid())
+  scheduleId     String
+  engineId       String
+  status         String   // SUCCESS, FAILED, SKIPPED
+  jobId          String?  // Link to the underlying gen job
+  publishedCount Int      @default(0)
+  skippedReason  String?
+  
+  startedAt      DateTime @default(now())
+  finishedAt     DateTime?
+  createdAt      DateTime @default(now())
+  
+  schedule       SeoSchedule @relation(fields: [scheduleId], references: [id])
+}

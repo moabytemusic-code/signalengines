@@ -1,0 +1,62 @@
+{
+    "engine_id": "sitehacked",
+    "engine_name": "Website Hack & Malware Recovery Engine",
+    "subdomain": "sitehacked",
+    "primary_keyword": "website hacked",
+    "secondary_keywords": [
+        "google malware warning site"
+    ],
+    "seo": {
+        "title": "Website Hacked? Scan & Fix It Fast",
+        "description": "Identify malware risk and get a cleanup plan instantly.",
+        "h1": "Website Hacked? Run a Scan"
+    },
+    "inputs": [
+        {
+            "id": "site_type",
+            "type": "select",
+            "label": "Website type",
+            "options": [
+                "WordPress",
+                "Shopify",
+                "Custom"
+            ],
+            "required": true
+        },
+        {
+            "id": "symptoms",
+            "type": "select",
+            "label": "Symptoms",
+            "options": [
+                "Redirects",
+                "Malware Warning",
+                "Unknown Admin"
+            ],
+            "required": true
+        }
+    ],
+    "scoring_rules": [
+        {
+            "id": "default",
+            "score": 75,
+            "message": "Critical Security Risk"
+        }
+    ],
+    "free_output_sections": [
+        "risk_score",
+        "infection_signs",
+        "first_actions"
+    ],
+    "paid_output_sections": [
+        "cleanup_steps",
+        "security_hardening"
+    ],
+    "pricing": {
+        "emergency": 7,
+        "full": 27,
+        "monthly": 29
+    },
+    "cross_sell_engines": [
+        "emailspam"
+    ]
+}

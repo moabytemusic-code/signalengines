@@ -1,0 +1,64 @@
+{
+    "engine_id": "accountrecovery",
+    "engine_name": "Account Access Recovery Engine",
+    "subdomain": "accountrecovery",
+    "primary_keyword": "facebook account locked",
+    "secondary_keywords": [
+        "google account recovery",
+        "business manager admin removed"
+    ],
+    "seo": {
+        "title": "Account Locked? Recover Access Fast (Free Scan)",
+        "description": "Find out why your account was locked and the fastest way to regain access.",
+        "h1": "Locked Out of an Account? Scan It Now"
+    },
+    "inputs": [
+        {
+            "id": "platform",
+            "type": "select",
+            "label": "Platform",
+            "options": [
+                "Facebook",
+                "Google",
+                "Instagram"
+            ],
+            "required": true
+        },
+        {
+            "id": "lock_type",
+            "type": "select",
+            "label": "Issue type",
+            "options": [
+                "Locked",
+                "Hacked",
+                "Admin Removed"
+            ],
+            "required": true
+        }
+    ],
+    "scoring_rules": [
+        {
+            "id": "default",
+            "score": 50,
+            "message": "Default Risk"
+        }
+    ],
+    "free_output_sections": [
+        "risk_score",
+        "likely_causes",
+        "first_5_steps"
+    ],
+    "paid_output_sections": [
+        "recovery_playbook",
+        "backup_admin_plan"
+    ],
+    "pricing": {
+        "emergency": 7,
+        "full": 27,
+        "monthly": 29
+    },
+    "cross_sell_engines": [
+        "fbadban",
+        "paymentfreeze"
+    ]
+}

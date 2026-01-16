@@ -1,0 +1,56 @@
+{
+    "engine_id": "adbleed",
+    "problem": "ads spending no conversions",
+    "variants": [
+        "facebook ads no sales",
+        "google ads no conversions",
+        "high cpc low sales",
+        "traffic not converting"
+    ],
+    "personas": [
+        "ecommerce owner",
+        "lead gen",
+        "affiliate marketer",
+        "agency"
+    ],
+    "causes": [
+        "wrong audience/intent mismatch",
+        "landing page friction (slow load, unclear offer, weak CTA)",
+        "tracking issues (pixel/conversion misfire)",
+        "offer/price mismatch for the traffic source",
+        "creative fatigue or weak messaging"
+    ],
+    "immediate_actions": [
+        "confirm conversion tracking works end-to-end",
+        "check landing page speed and mobile UX",
+        "tighten message match between ad and page",
+        "set kill-switch rules to cap losses",
+        "test one variable at a time (offer, creative, audience)"
+    ],
+    "mistakes": [
+        "changing multiple variables simultaneously",
+        "optimizing for clicks instead of conversions",
+        "sending cold traffic to complex funnels",
+        "ignoring mobile performance",
+        "no stop-loss rules"
+    ],
+    "prevention": [
+        "use conversion-focused campaigns with clear KPIs",
+        "maintain a testing framework (creative, audience, offer)",
+        "build a fast, single-goal landing page",
+        "monitor frequency and creative fatigue",
+        "implement kill-switch + daily spend governance"
+    ],
+    "faqs": [
+        "Why are my ads getting clicks but no sales?",
+        "How do I know if tracking is broken?",
+        "What’s the fastest landing page fix that improves conversions?",
+        "How do I stop wasting spend immediately?",
+        "What should I test first: offer, audience, or creative?"
+    ],
+    "related_engines": [
+        "fbadban",
+        "paymentfreeze",
+        "emailspam"
+    ]
+}

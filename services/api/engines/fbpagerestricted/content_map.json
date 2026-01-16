@@ -1,0 +1,55 @@
+{
+    "engine_id": "fbpagerestricted",
+    "problem": "facebook page unpublished",
+    "variants": [
+        "facebook page restricted",
+        "facebook page disabled",
+        "business page unpublished",
+        "page violations"
+    ],
+    "personas": [
+        "small business owner",
+        "agency",
+        "local business",
+        "creator brand"
+    ],
+    "causes": [
+        "policy violations in posts or ads",
+        "copyright or trademark complaints",
+        "misleading business information",
+        "user reports or coordinated reporting",
+        "linked ad account or BM enforcement"
+    ],
+    "immediate_actions": [
+        "review Page Quality and violation notices",
+        "remove or edit flagged content",
+        "verify business and page information",
+        "submit a single clear appeal with documentation",
+        "pause ads tied to the Page if applicable"
+    ],
+    "mistakes": [
+        "posting similar content during review",
+        "creating duplicate Pages",
+        "appealing without fixing violations",
+        "arguing emotionally in appeals",
+        "using copyrighted media without rights"
+    ],
+    "prevention": [
+        "follow content and ad policies strictly",
+        "use licensed images and videos only",
+        "keep business details accurate and consistent",
+        "limit automation and repetitive posting",
+        "monitor Page Quality regularly"
+    ],
+    "faqs": [
+        "Why was my Facebook Page unpublished?",
+        "How do I appeal a Page restriction?",
+        "How long does Facebook Page review take?",
+        "Can Page issues affect ad accounts?",
+        "How do I avoid future Page restrictions?"
+    ],
+    "related_engines": [
+        "fbadban",
+        "accountrecovery"
+    ]
+}

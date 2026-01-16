@@ -1,0 +1,19 @@
+{
+  "engine_id": "tiktok-idea-batch",
+  "engine_name": "TikTok Viral Idea Batch",
+  "category": "Growth",
+  "primary_keyword": "content ideas",
+  "shortDescription": "Generate 10 viral video concepts tailored to your niche and audience pain points.",
+  "status": "live",
+  "accessTier": "free",
+  "inputs": [
+    { "id": "niche", "label": "Niche / Industry", "type": "text", "placeholder": "e.g. Real Estate, Fitness, SaaS" },
+    { "id": "pain_point", "label": "Main Audience Pain Point", "type": "text", "placeholder": "e.g. Can't save money, Back pain, Slow wifi" }
+  ],
+  "scoring_rules": { "base_risk": 10 },
+  "seo": {
+    "title": "TikTok Viral Idea Generator | Signal Engines",
+    "description": "Stuck on what to post? Generate 10 high-conversion TikTok/Reels ideas in seconds."
+  },
+  "subdomain": "ideas"
+}

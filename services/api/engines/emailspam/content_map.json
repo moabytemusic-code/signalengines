@@ -1,0 +1,56 @@
+{
+    "engine_id": "emailspam",
+    "problem": "emails going to spam",
+    "variants": [
+        "email deliverability issues",
+        "gmail spam",
+        "domain reputation",
+        "dkim spf dmarc"
+    ],
+    "personas": [
+        "affiliate marketer",
+        "newsletter creator",
+        "agency",
+        "SaaS lifecycle marketer"
+    ],
+    "causes": [
+        "missing/incorrect SPF, DKIM, DMARC",
+        "poor sending reputation from sudden volume spikes",
+        "low engagement (opens/clicks) + high complaint rate",
+        "spammy copy patterns and link tracking issues",
+        "dirty or purchased lists"
+    ],
+    "immediate_actions": [
+        "verify SPF/DKIM/DMARC alignment",
+        "reduce volume and warm up gradually",
+        "clean list (remove bounces, inactive, complainers)",
+        "improve content: reduce spam triggers and add plain-text style",
+        "monitor inbox placement and complaints"
+    ],
+    "mistakes": [
+        "blasting cold lists at high volume",
+        "sending from a fresh domain without warm-up",
+        "too many links/trackers and aggressive subject lines",
+        "ignoring bounces and complaints",
+        "no unsubscribe or unclear sender identity"
+    ],
+    "prevention": [
+        "maintain authentication + alignment",
+        "keep steady sending cadence",
+        "use engagement-based segmentation",
+        "opt-in only and confirm consent",
+        "monitor reputation and inbox placement weekly"
+    ],
+    "faqs": [
+        "Why are my emails suddenly going to spam?",
+        "What SPF/DKIM/DMARC settings do I need?",
+        "How long does reputation recovery take?",
+        "Should I switch domains or IPs?",
+        "What content changes improve inboxing?"
+    ],
+    "related_engines": [
+        "paymentfreeze",
+        "adbleed",
+        "fbadban"
+    ]
+}

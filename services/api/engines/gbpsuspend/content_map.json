@@ -1,0 +1,57 @@
+{
+    "engine_id": "gbpsuspend",
+    "problem": "google business profile suspended",
+    "variants": [
+        "google my business suspended",
+        "gbp suspended",
+        "google maps listing suspended",
+        "reinstatement request"
+    ],
+    "personas": [
+        "local service business",
+        "restaurant",
+        "clinic",
+        "home services",
+        "agency managing local SEO"
+    ],
+    "causes": [
+        "inaccurate business name/address/category",
+        "address issues (virtual office, shared space, residential visibility problems)",
+        "service-area business rules not followed",
+        "suspicious edits or frequent changes",
+        "policy violations (ineligible business type, keyword stuffing)"
+    ],
+    "immediate_actions": [
+        "review recent edits and revert risky changes",
+        "validate NAP consistency across site and citations",
+        "prepare proof documents (license, utility bill, signage, photos)",
+        "submit reinstatement with precise, consistent information",
+        "avoid repeated edits while pending"
+    ],
+    "mistakes": [
+        "keyword stuffing in business name",
+        "using an ineligible address/location setup",
+        "making multiple edits during review",
+        "submitting weak proof or mismatched documentation",
+        "creating duplicate listings"
+    ],
+    "prevention": [
+        "keep NAP consistent everywhere",
+        "use correct categories and avoid misleading keywords",
+        "limit edits and keep a change log",
+        "maintain real-world proof assets (photos, signage, docs)",
+        "follow SAB guidelines precisely"
+    ],
+    "faqs": [
+        "Why was my Google Business Profile suspended?",
+        "What proof is required for reinstatement?",
+        "How long does reinstatement take?",
+        "Should I edit my listing while suspended?",
+        "How do I prevent future suspensions?"
+    ],
+    "related_engines": [
+        "reviewrepair",
+        "compliancealert",
+        "accountrecovery"
+    ]
+}

@@ -1,0 +1,78 @@
+{
+    "engine_id": "merchantsuspend",
+    "engine_name": "Merchant Account Suspension Fix",
+    "subdomain": "merchantsuspend",
+    "primary_keyword": "stripe account suspended",
+    "secondary_keywords": [
+        "paypal limitation appeal",
+        "merchant center suspension"
+    ],
+    "seo": {
+        "title": "Merchant Account Suspended? Get Your Appeal Plan",
+        "description": "Diagnose the reason for your Stripe, PayPal, or Google Merchant Center suspension and get an appeal template.",
+        "h1": "Recover Your Merchant Processing Account"
+    },
+    "inputs": [
+        {
+            "id": "status",
+            "type": "select",
+            "label": "Account status",
+            "options": [
+                "Restricted",
+                "Disabled",
+                "Ads Rejected Only"
+            ],
+            "required": true
+        },
+        {
+            "id": "business_type",
+            "type": "select",
+            "label": "Business type",
+            "options": [
+                "Ecom",
+                "Affiliate",
+                "Local",
+                "Info Product"
+            ],
+            "required": true
+        },
+        {
+            "id": "ad_copy",
+            "type": "textarea",
+            "label": "Paste your ad copy (optional)",
+            "required": false
+        }
+    ],
+    "scoring_rules": [
+        {
+            "id": "risk_phrases",
+            "type": "keyword_match",
+            "field": "ad_copy",
+            "keywords": [
+                "guaranteed",
+                "lose weight fast",
+                "before and after"
+            ],
+            "score": 25
+        }
+    ],
+    "free_output_sections": [
+        "risk_score",
+        "likely_causes",
+        "first_5_steps"
+    ],
+    "paid_output_sections": [
+        "appeal_template",
+        "prevention_checklist",
+        "backup_account_structure"
+    ],
+    "pricing": {
+        "emergency": 7,
+        "full": 27,
+        "monthly": 29
+    },
+    "cross_sell_engines": [
+        "emailspam",
+        "paymentfreeze"
+    ]
+}

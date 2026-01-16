@@ -1,0 +1,16 @@
+name: SEO Content Cron
+
+on:
+  schedule:
+    - cron: '0 * * * *' # Run hourly
+  workflow_dispatch:
+
+jobs:
+  tick:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call API Tick
+        run: |
+          curl -X POST "${{ secrets.API_BASE_URL || 'https://api.signalengines.com' }}/admin/seo/scheduler/tick" \
+          -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+          -H "Content-Type: application/json"

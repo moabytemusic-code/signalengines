@@ -1,0 +1,56 @@
+{
+    "engine_id": "accountrecovery",
+    "problem": "account locked out recovery",
+    "variants": [
+        "facebook account locked",
+        "google account recovery",
+        "instagram disabled",
+        "admin removed business manager"
+    ],
+    "personas": [
+        "small business owner",
+        "agency",
+        "creator",
+        "ecommerce operator"
+    ],
+    "causes": [
+        "suspicious login or location triggers",
+        "compromised credentials/phishing",
+        "2FA loss or phone/email access issues",
+        "admin roles changed or removed",
+        "policy enforcement on identity/account integrity"
+    ],
+    "immediate_actions": [
+        "secure email first (password, 2FA, recovery options)",
+        "review account recovery paths and gather proof",
+        "identify if this is hack vs enforcement",
+        "restore admin access using official recovery flows",
+        "document timeline and submit one clear request"
+    ],
+    "mistakes": [
+        "trying random third-party recovery services",
+        "not securing email before platform recovery",
+        "changing too many settings quickly",
+        "ignoring recovery codes/backup methods setup",
+        "no documentation of ownership or access history"
+    ],
+    "prevention": [
+        "use password manager + unique passwords",
+        "enable 2FA + backup codes",
+        "set multiple admins and verified roles (where allowed)",
+        "keep business verification updated",
+        "monitor login alerts and permission changes"
+    ],
+    "faqs": [
+        "What should I secure first if I’m locked out?",
+        "How do I recover a hacked Facebook/Google account?",
+        "What proof do platforms accept?",
+        "How do I prevent admin removal issues?",
+        "How long do recovery processes take?"
+    ],
+    "related_engines": [
+        "fbadban",
+        "paymentfreeze",
+        "sitehacked"
+    ]
+}

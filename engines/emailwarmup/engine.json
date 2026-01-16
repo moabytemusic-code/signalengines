@@ -1,0 +1,18 @@
+{
+  "engine_id": "emailwarmup",
+  "engine_name": "Email Reputation Checker",
+  "category": "Deliverability",
+  "primary_keyword": "email warmup",
+  "shortDescription": "Check for blacklists and low sender reputation scores.",
+  "status": "live",
+  "accessTier": "free",
+  "inputs": [
+    { "id": "domain", "label": "Sender Domain", "type": "text", "placeholder": "e.g. getsignal.com" }
+  ],
+  "scoring_rules": { "base_risk": 40 },
+  "seo": {
+    "title": "Email Warmup & Reputation Checker",
+    "description": "Don't land in spam. Check your sender reputation and warmup status."
+  },
+  "subdomain": "warmup"
+}

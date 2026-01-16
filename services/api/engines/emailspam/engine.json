@@ -1,0 +1,64 @@
+{
+    "engine_id": "emailspam",
+    "engine_name": "Email Deliverability Fix Engine",
+    "subdomain": "emailspam",
+    "primary_keyword": "emails going to spam",
+    "secondary_keywords": [
+        "improve email deliverability",
+        "warm up domain"
+    ],
+    "seo": {
+        "title": "Emails Going to Spam? Fix Deliverability Now",
+        "description": "Stop landing in spam. Diagnose SPF, DKIM, and reputation issues.",
+        "h1": "Fix Your Email Deliverability"
+    },
+    "inputs": [
+        {
+            "id": "provider",
+            "type": "select",
+            "label": "Email Provider",
+            "options": [
+                "Gmail/Google Workspace",
+                "Outlook/O365",
+                "Custom SMTP"
+            ],
+            "required": true
+        },
+        {
+            "id": "volume",
+            "type": "select",
+            "label": "Daily Volume",
+            "options": [
+                "<100",
+                "100-1000",
+                "1000+"
+            ],
+            "required": true
+        }
+    ],
+    "scoring_rules": [
+        {
+            "id": "default",
+            "score": 55,
+            "message": "Spam Risk Detect"
+        }
+    ],
+    "free_output_sections": [
+        "spam_score",
+        "dns_check",
+        "copy_analysis"
+    ],
+    "paid_output_sections": [
+        "warmup_schedule",
+        "reputation_monitoring"
+    ],
+    "pricing": {
+        "emergency": 7,
+        "full": 27,
+        "monthly": 29
+    },
+    "cross_sell_engines": [
+        "fbadban",
+        "adbleed"
+    ]
+}

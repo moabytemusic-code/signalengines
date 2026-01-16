@@ -1,0 +1,56 @@
+{
+    "engine_id": "amazonsuspend",
+    "problem": "amazon seller account suspended",
+    "variants": [
+        "amazon seller suspension",
+        "plan of action",
+        "amazon account deactivated",
+        "listing removed"
+    ],
+    "personas": [
+        "FBA seller",
+        "FBM seller",
+        "private label brand",
+        "reseller"
+    ],
+    "causes": [
+        "policy violations (claims, restricted products, IP issues)",
+        "inauthentic complaints or invoice/receipt problems",
+        "late shipment rate, cancellation rate, negative feedback",
+        "safety/quality complaints",
+        "account verification failures"
+    ],
+    "immediate_actions": [
+        "identify the exact suspension reason from the performance notification",
+        "gather evidence (invoices, supplier info, screenshots, QC steps)",
+        "write a clean POA: root cause → corrective actions → preventive measures",
+        "remove or correct offending listings",
+        "submit once with complete documentation"
+    ],
+    "mistakes": [
+        "sending emotional appeals instead of structured POA",
+        "missing invoices or providing unverifiable supplier docs",
+        "blaming Amazon or customers",
+        "relisting without fixing root cause",
+        "submitting multiple inconsistent POAs"
+    ],
+    "prevention": [
+        "maintain supplier verification and invoice records",
+        "tight QC and compliance checks per listing",
+        "monitor account health metrics weekly",
+        "use conservative claims and accurate product descriptions",
+        "document SOPs for returns, fulfillment, and customer service"
+    ],
+    "faqs": [
+        "What is an Amazon Plan of Action (POA)?",
+        "How long does Amazon take to review an appeal?",
+        "What documents strengthen an appeal?",
+        "Can I open a new seller account after suspension?",
+        "How do I prevent IP or authenticity complaints?"
+    ],
+    "related_engines": [
+        "paymentfreeze",
+        "compliancealert",
+        "sitehacked"
+    ]
+}

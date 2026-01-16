@@ -1,0 +1,61 @@
+{
+    "engine_id": "reviewrepair",
+    "engine_name": "Google Review Repair Engine",
+    "subdomain": "reviewrepair",
+    "primary_keyword": "remove fake google reviews",
+    "secondary_keywords": [
+        "google reviews dropped rating"
+    ],
+    "seo": {
+        "title": "Bad Google Reviews? Repair Your Rating Fast",
+        "description": "Scan your review damage and get step-by-step repair actions.",
+        "h1": "Fix Your Google Reviews Now"
+    },
+    "inputs": [
+        {
+            "id": "rating_drop",
+            "type": "select",
+            "label": "Recent rating drop?",
+            "options": [
+                "Yes",
+                "No"
+            ],
+            "required": true
+        },
+        {
+            "id": "review_type",
+            "type": "select",
+            "label": "Issue type",
+            "options": [
+                "Fake Reviews",
+                "Competitor Spam",
+                "Customer Complaints"
+            ],
+            "required": true
+        }
+    ],
+    "scoring_rules": [
+        {
+            "id": "default",
+            "score": 40,
+            "message": "Review Damage Detected"
+        }
+    ],
+    "free_output_sections": [
+        "damage_score",
+        "likely_causes",
+        "immediate_actions"
+    ],
+    "paid_output_sections": [
+        "removal_scripts",
+        "review_rebuild_system"
+    ],
+    "pricing": {
+        "emergency": 7,
+        "full": 27,
+        "monthly": 29
+    },
+    "cross_sell_engines": [
+        "gbpsuspend"
+    ]
+}

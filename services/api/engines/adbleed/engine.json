@@ -1,0 +1,63 @@
+{
+    "engine_id": "adbleed",
+    "engine_name": "Ad Spend Bleed Diagnostic Engine",
+    "subdomain": "adbleed",
+    "primary_keyword": "facebook ads no sales",
+    "secondary_keywords": [
+        "ads spending no conversions"
+    ],
+    "seo": {
+        "title": "Ads Spending but No Sales? Find the Leak",
+        "description": "Scan your ad funnel and stop wasting money.",
+        "h1": "Stop Ad Spend Bleeding"
+    },
+    "inputs": [
+        {
+            "id": "platform",
+            "type": "select",
+            "label": "Ad platform",
+            "options": [
+                "Facebook",
+                "Google",
+                "TikTok"
+            ],
+            "required": true
+        },
+        {
+            "id": "daily_spend",
+            "type": "select",
+            "label": "Daily spend",
+            "options": [
+                "<$50",
+                "$50–$200",
+                "$200+"
+            ],
+            "required": true
+        }
+    ],
+    "scoring_rules": [
+        {
+            "id": "default",
+            "score": 45,
+            "message": "Budget Leak Detected"
+        }
+    ],
+    "free_output_sections": [
+        "bleed_score",
+        "likely_leaks",
+        "quick_fixes"
+    ],
+    "paid_output_sections": [
+        "funnel_fix_plan",
+        "kill_switch_rules"
+    ],
+    "pricing": {
+        "emergency": 7,
+        "full": 27,
+        "monthly": 29
+    },
+    "cross_sell_engines": [
+        "fbadban",
+        "paymentfreeze"
+    ]
+}

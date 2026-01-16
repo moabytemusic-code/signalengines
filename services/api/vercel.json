@@ -1,0 +1,11 @@
+{
+    "version": 2,
+    "installCommand": "cd ../.. && npm install && cd services/api",
+    "buildCommand": "cd ../../packages/engine-config && npm run build && cd ../../services/api && npm run build",
+    "rewrites": [
+        {
+            "source": "/(.*)",
+            "destination": "/api/index"
+        }
+    ]
+}

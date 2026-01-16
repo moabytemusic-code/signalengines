@@ -1,0 +1,55 @@
+{
+    "engine_id": "trackingfix",
+    "problem": "conversion tracking broken",
+    "variants": [
+        "facebook pixel not tracking",
+        "google ads conversions not recording",
+        "gtm not firing",
+        "conversion data missing"
+    ],
+    "personas": [
+        "media buyer",
+        "ecommerce owner",
+        "affiliate marketer",
+        "agency"
+    ],
+    "causes": [
+        "recent site or theme changes",
+        "tag misconfiguration or conflicts",
+        "cookie consent blocking events",
+        "ad blockers or browser restrictions",
+        "incorrect conversion setup"
+    ],
+    "immediate_actions": [
+        "verify events using platform diagnostics",
+        "check tag firing in preview/debug mode",
+        "confirm consent and cookie behavior",
+        "test conversions end-to-end",
+        "fix one variable at a time"
+    ],
+    "mistakes": [
+        "changing multiple tracking settings at once",
+        "assuming clicks equal conversions",
+        "ignoring mobile tracking differences",
+        "not testing after site updates",
+        "using duplicate or outdated tags"
+    ],
+    "prevention": [
+        "document tracking setup and changes",
+        "test after every site update",
+        "use server-side tracking where possible",
+        "monitor event health weekly",
+        "keep a rollback plan"
+    ],
+    "faqs": [
+        "Why did my conversions stop tracking?",
+        "How do I test if my pixel is firing?",
+        "Can cookie consent break tracking?",
+        "What’s the fastest way to debug conversions?",
+        "How do I prevent tracking issues in the future?"
+    ],
+    "related_engines": [
+        "adbleed",
+        "fbadban"
+    ]
+}

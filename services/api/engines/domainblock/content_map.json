@@ -1,0 +1,55 @@
+{
+    "engine_id": "domainblock",
+    "problem": "domain reputation blocked",
+    "variants": [
+        "domain blacklisted",
+        "email domain blocked",
+        "domain reputation bad",
+        "domain flagged as spam"
+    ],
+    "personas": [
+        "email marketer",
+        "saas founder",
+        "affiliate marketer",
+        "ecommerce owner"
+    ],
+    "causes": [
+        "high spam complaint rates",
+        "sudden email volume spikes",
+        "poor list hygiene or purchased lists",
+        "shared hosting or IP reputation issues",
+        "missing or misconfigured SPF/DKIM/DMARC"
+    ],
+    "immediate_actions": [
+        "identify which blacklist or filter is blocking the domain",
+        "pause high-volume sending immediately",
+        "verify SPF, DKIM, and DMARC alignment",
+        "remove recent spam sources and clean lists",
+        "submit delisting requests with evidence of remediation"
+    ],
+    "mistakes": [
+        "continuing to send while blacklisted",
+        "switching domains without fixing root cause",
+        "ignoring authentication errors",
+        "using aggressive subject lines and links",
+        "sending to inactive or unverified contacts"
+    ],
+    "prevention": [
+        "maintain consistent sending cadence",
+        "authenticate all sending domains",
+        "monitor reputation and blacklist status weekly",
+        "use confirmed opt-in and engagement-based pruning",
+        "separate transactional and marketing domains"
+    ],
+    "faqs": [
+        "Why was my domain blacklisted?",
+        "How long does blacklist removal take?",
+        "Which blacklists matter most?",
+        "Should I change domains?",
+        "How do I monitor domain reputation?"
+    ],
+    "related_engines": [
+        "emailspam",
+        "paymentfreeze"
+    ]
+}

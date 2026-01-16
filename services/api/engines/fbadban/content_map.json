@@ -1,0 +1,58 @@
+{
+    "engine_id": "fbadban",
+    "problem": "facebook ad account disabled",
+    "variants": [
+        "restricted",
+        "banned",
+        "suspended",
+        "business manager disabled",
+        "ads rejected"
+    ],
+    "personas": [
+        "affiliate marketer",
+        "ecommerce owner",
+        "local lead gen",
+        "agency media buyer"
+    ],
+    "causes": [
+        "policy-triggering ad copy (claims, sensitive attributes, before/after)",
+        "landing page non-compliance (missing disclosures, misleading content)",
+        "payment method or billing integrity issues",
+        "account trust issues (new BM, unusual activity, multiple rejections)",
+        "circumvention signals (new accounts after enforcement)"
+    ],
+    "immediate_actions": [
+        "confirm the exact enforcement type (restricted vs disabled vs rejected ads)",
+        "pause new ad edits and avoid repeated submissions",
+        "review last rejected ads and landing pages for policy triggers",
+        "verify business info, payment method, and domain consistency",
+        "submit one clean appeal with concise, factual language"
+    ],
+    "mistakes": [
+        "submitting multiple appeals in a short period",
+        "creating new accounts to bypass enforcement",
+        "editing ads/landing pages during review without documenting changes",
+        "using aggressive claims or “guarantee” language",
+        "running traffic to thin, misleading, or unsupported landing pages"
+    ],
+    "prevention": [
+        "use policy-safe copy patterns and avoid sensitive attribute phrasing",
+        "keep consistent business identity (domain, billing, business info)",
+        "warm up new accounts and avoid sudden spending spikes",
+        "maintain a rejection log and fix root causes before relaunch",
+        "use backup admin + verified BM structure (legitimate, not circumvention)"
+    ],
+    "faqs": [
+        "Why did my Facebook ad account get disabled?",
+        "How long does Facebook appeal review take?",
+        "What should I include in an appeal?",
+        "Can I create a new ad account if mine is disabled?",
+        "How do I prevent this from happening again?"
+    ],
+    "related_engines": [
+        "paymentfreeze",
+        "emailspam",
+        "adbleed",
+        "accountrecovery"
+    ]
+}

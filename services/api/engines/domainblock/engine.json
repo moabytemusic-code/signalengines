@@ -1,0 +1,75 @@
+{
+    "engine_id": "domainblock",
+    "engine_name": "Domain Blacklist & Reputation Engine",
+    "subdomain": "domainblock",
+    "primary_keyword": "domain blacklisted",
+    "secondary_keywords": [
+        "domain reputation bad",
+        "email domain blocked"
+    ],
+    "seo": {
+        "title": "Domain Blacklisted? Free Reputation Scan + Fix",
+        "description": "Emails going to spam or domain blocked? Identify the specific blacklists and get a clean-up and delisting guide immediately.",
+        "h1": "Check & Fix Your Domain Reputation"
+    },
+    "inputs": [
+        {
+            "id": "symptom",
+            "type": "select",
+            "label": "Main symptom",
+            "options": [
+                "Blacklisted",
+                "Blocked emails",
+                "Deliverability drop"
+            ],
+            "required": true
+        },
+        {
+            "id": "frequency",
+            "type": "select",
+            "label": "When did it start?",
+            "options": [
+                "Just now",
+                "Last week",
+                "Ongoing issue"
+            ],
+            "required": true
+        }
+    ],
+    "scoring_rules": [
+        {
+            "id": "symptom_severity",
+            "type": "select_match",
+            "field": "symptom",
+            "matches": [
+                {
+                    "value": "Blacklisted",
+                    "score": 30
+                },
+                {
+                    "value": "Blocked emails",
+                    "score": 20
+                }
+            ]
+        }
+    ],
+    "free_output_sections": [
+        "risk_score",
+        "likely_causes",
+        "first_5_steps"
+    ],
+    "paid_output_sections": [
+        "appeal_template",
+        "prevention_checklist",
+        "blacklist_removal_guide"
+    ],
+    "pricing": {
+        "emergency": 7,
+        "full": 27,
+        "monthly": 29
+    },
+    "cross_sell_engines": [
+        "emailspam",
+        "paymentfreeze"
+    ]
+}

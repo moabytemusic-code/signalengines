@@ -1,0 +1,60 @@
+{
+    "engine_id": "gbpsuspend",
+    "engine_name": "Google Business Profile Reinstatement",
+    "subdomain": "gbpsuspend",
+    "primary_keyword": "google business profile suspended",
+    "secondary_keywords": [
+        "gbp suspended",
+        "google my business reinstatement"
+    ],
+    "seo": {
+        "title": "Google Business Profile Suspended? Instant Check",
+        "description": "Diagnostic tool for suspended Google Business Profiles. Identify the suspension reason and get a reinstatement guide.",
+        "h1": "Restore Your Google Business Profile"
+    },
+    "inputs": [
+        {
+            "id": "suspension_type",
+            "type": "select",
+            "label": "Suspension Type",
+            "options": [
+                "Hard Suspension (Removed from Maps)",
+                "Soft Suspension (Pending Review)"
+            ],
+            "validation": "required"
+        },
+        {
+            "id": "address_hidden",
+            "type": "select",
+            "label": "Is your address hidden?",
+            "options": [
+                "Yes (Service Area Business)",
+                "No (Storefront)"
+            ],
+            "validation": "required"
+        }
+    ],
+    "scoring_rules": [
+        {
+            "id": "hard_suspension",
+            "type": "condition",
+            "condition": "suspension_type == 'Hard Suspension'",
+            "score": -50,
+            "message": "Hard suspensions often require proof of legal entity."
+        }
+    ],
+    "free_output_sections": [
+        "suspension_analysis",
+        "immediate_actions"
+    ],
+    "paid_output_sections": [
+        "reinstatement_form_guide",
+        "evidence_checklist"
+    ],
+    "pricing": {
+        "emergency": 9,
+        "full": 39,
+        "monthly": 19
+    },
+    "cross_sell_engines": []
+}

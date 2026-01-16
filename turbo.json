@@ -1,0 +1,31 @@
+{
+    "$schema": "https://turbo.build/schema.json",
+    "globalDependencies": [
+        "**/.env.*local"
+    ],
+    "tasks": {
+        "build": {
+            "dependsOn": [
+                "^build"
+            ],
+            "env": [
+                "NEXT_PUBLIC_API_BASE_URL",
+                "STRIPE_SECRET_KEY",
+                "STRIPE_PRICE_EMERGENCY",
+                "STRIPE_PRICE_FULL",
+                "STRIPE_PRICE_MONTHLY",
+                "STRIPE_WEBHOOK_SECRET", "OPENAI_API_KEY", "SUPABASE_URL", "SUPABASE_ANON_KEY", "STRIPE_PRICE_ID_STARTER", "STRIPE_PRICE_ID_AGENCY", "ENCRYPTION_KEY"
+            ],
+            "outputs": [
+                ".next/**",
+                "!.next/cache/**",
+                "dist/**"
+            ]
+        },
+        "lint": {},
+        "dev": {
+            "cache": false,
+            "persistent": true
+        }
+    }
+}

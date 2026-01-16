@@ -1,0 +1,65 @@
+{
+    "engine_id": "amazonsuspend",
+    "engine_name": "Amazon Seller Suspension Appeal Engine",
+    "subdomain": "amazonsuspend",
+    "primary_keyword": "amazon seller account suspended",
+    "secondary_keywords": [
+        "amazon plan of action",
+        "amazon appeal service"
+    ],
+    "seo": {
+        "title": "Amazon Account Suspended? Get Reinstated Fast",
+        "description": "Generate a winning Plan of Action (POA) for Amazon Seller Central.",
+        "h1": "Amazon Seller Suspended? Fix It Now"
+    },
+    "inputs": [
+        {
+            "id": "suspension_reason",
+            "type": "select",
+            "label": "Suspension Reason",
+            "options": [
+                "Inauthentic",
+                "IP Claim",
+                "High ODR",
+                "Related Account"
+            ],
+            "required": true
+        },
+        {
+            "id": "appeal_status",
+            "type": "select",
+            "label": "Status",
+            "options": [
+                "First Appeal",
+                "Rejected",
+                "Final Decision"
+            ],
+            "required": true
+        }
+    ],
+    "scoring_rules": [
+        {
+            "id": "default",
+            "score": 30,
+            "message": "Suspension Risk"
+        }
+    ],
+    "free_output_sections": [
+        "suspension_analysis",
+        "poa_outline",
+        "doc_checklist"
+    ],
+    "paid_output_sections": [
+        "full_poa_template",
+        "escalation_guide"
+    ],
+    "pricing": {
+        "emergency": 7,
+        "full": 27,
+        "monthly": 29
+    },
+    "cross_sell_engines": [
+        "paymentfreeze",
+        "compliancealert"
+    ]
+}
