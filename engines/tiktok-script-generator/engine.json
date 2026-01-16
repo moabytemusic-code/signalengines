@@ -1,0 +1,38 @@
+{
+    "engine_id": "tiktok-script-generator",
+    "engine_name": "TikTok Script Generator",
+    "category": "Growth",
+    "primary_keyword": "tiktok script",
+    "shortDescription": "Turn any idea into a viral script in seconds (Hook, Body, CTA).",
+    "status": "live",
+    "accessTier": "free",
+    "inputs": [
+        {
+            "id": "topic",
+            "type": "text",
+            "label": "Video Topic",
+            "placeholder": "e.g. How to save money on groceries",
+            "required": true
+        },
+        {
+            "id": "tone",
+            "type": "select",
+            "label": "Tone",
+            "options": [
+                "Funny",
+                "Educational",
+                "Controversial",
+                "Storytime"
+            ],
+            "required": true
+        }
+    ],
+    "scoring_rules": {
+        "base_risk": 0
+    },
+    "seo": {
+        "title": "Free TikTok Script Generator | Viral Hooks & CTAs",
+        "description": "Generate high-retention TikTok and Reels scripts with viral hooks, body content, and call-to-actions."
+    },
+    "subdomain": "scripts"
+}

@@ -57,7 +57,7 @@ const ALIAS_MAP: Record<string, string> = {
     "chargeback": "chargebackalert",
     "dispute": "chargebackalert",
     "fbrestricted": "fbpagerestricted",
-    "page": "fbpagerestricted", "ideas": "tiktok-idea-batch"
+    "page": "fbpagerestricted", "ideas": "tiktok-idea-batch", "scripts": "tiktok-script-generator"
 };
 
 export function getEngineIdFromHost(hostname: string): string | null {

@@ -67,6 +67,17 @@ const ENGINES_SIMULATION: Record<string, any> = {
             "Concept 5: Storytime - Tell a customer success or failure story."
         ]
     },
+    "tiktok-script-generator": {
+        risk: 5,
+        causes: ["Viral Hook Structure", "High Retention Body", "Clear Call To Action"],
+        steps: [
+            "HOOK: Stop scrolling if you want to save time.",
+            "BODY: I found a tool that turns ideas into scripts instantly.",
+            "CTA: Check the link in my bio.",
+            "CAPTION: #productivity #hacks #fyp",
+            "VISUAL: Pointing at green screen background."
+        ]
+    },
     accountrecovery: {
         risk: 80,
         causes: ["Suspicious Login Activity", "AI-Flagged Behavior", "Failed 2FA Attempts"],
@@ -239,7 +250,7 @@ export async function executeEngineRun(
 
     // 2. Mock Logic (Engine-Aware Simulation)
     const sim = ENGINES_SIMULATION[engine.engine_id] || DEFAULT_SIMULATION;
-    
+
     // Add jitter to risk score (+/- 5) to feel dynamic
     const jitter = Math.floor(Math.random() * 10) - 5;
     const finalRisk = Math.min(100, Math.max(0, sim.risk + jitter));

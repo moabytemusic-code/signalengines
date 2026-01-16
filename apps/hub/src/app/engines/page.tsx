@@ -8,6 +8,7 @@ import { ArrowRight, Search, Activity, Shield, DollarSign, Lock, AlertTriangle }
 const ACTIVE_ENGINES = [
     { id: "emailwarmup", name: "Email Reputation Checker", category: "Deliverability", shortDescription: "Check for blacklists and low sender reputation scores.", status: "live", accessTier: "free", launchUrl: "https://warmup.signalengines.com" },
     { id: "tiktok-idea-batch", name: "TikTok Viral Idea Batch", category: "Growth", shortDescription: "Generate 10 viral video concepts tailored to your niche.", status: "live", accessTier: "free", launchUrl: "https://ideas.signalengines.com" },
+    { id: "tiktok-script-generator", name: "TikTok Script Generator", category: "Growth", shortDescription: "Turn any idea into a viral script in seconds (Hook, Body, CTA).", status: "live", accessTier: "free", launchUrl: "https://scripts.signalengines.com" },
     { id: "fbadban", name: "Facebook Ad Account Disabled", category: "Facebook", shortDescription: "Recover disabled ad accounts and unrestricted generic assets.", status: "live", accessTier: "free", launchUrl: "https://fbadban.signalengines.com" },
     { id: "fbpagerestricted", name: "Facebook Page Restricted", category: "Facebook", shortDescription: "Appeal restricted Facebook Business Pages.", status: "live", accessTier: "free", launchUrl: "https://fbpagerestricted.signalengines.com" },
     { id: "accountrecovery", name: "Account Access Recovery", category: "Facebook", shortDescription: "Find out why your account was locked and the fastest way to regain access.", status: "live", accessTier: "free", launchUrl: "https://accountrecovery.signalengines.com" },
@@ -28,6 +29,7 @@ const ACTIVE_ENGINES = [
 const ENGINE_MICROCOPY: Record<string, string> = {
     "emailwarmup": "See if you are landing in spam.",
     "tiktok-idea-batch": "Unlock 10 viral concepts in 30s.",
+    "tiktok-script-generator": "Get a full script in 5 seconds.",
     accountrecovery: "Fast recovery checklist—start here.",
     adbleed: "Spot wasted spend in 2 minutes.",
     amazonsuspend: "Appeal framework + action plan.",
@@ -61,11 +63,11 @@ export default function EnginesDir() {
                 if (r.ok) {
                     const data = await r.json();
                     if (Array.isArray(data) && data.length > 0) {
-                        const apiIds=new Set(data.map((e:any)=>e.engine_id||e.id));const missing=ACTIVE_ENGINES.filter(e=>!apiIds.has(e.id)).map(e=>({engine_id:e.id,engine_name:e.name,category:e.category,shortDescription:e.shortDescription,accessTier:e.accessTier,launchUrl:e.launchUrl}));setEngines([...data,...missing]); 
+                        const apiIds = new Set(data.map((e: any) => e.engine_id || e.id)); const missing = ACTIVE_ENGINES.filter(e => !apiIds.has(e.id)).map(e => ({ engine_id: e.id, engine_name: e.name, category: e.category, shortDescription: e.shortDescription, accessTier: e.accessTier, launchUrl: e.launchUrl })); setEngines([...data, ...missing]);
                     }
                 }
             })
-            .catch(() => {});
+            .catch(() => { });
     }, []);
 
     const filtered = engines.filter((e: any) => {
@@ -112,7 +114,7 @@ export default function EnginesDir() {
                         const kw = engine.primary_keyword || engine.category || "Utility";
                         const link = `/go/${id}`;
                         const microcopy = ENGINE_MICROCOPY[id] || DEFAULT_MICROCOPY;
-                        
+
                         return (
                             <div key={id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col hover:shadow-md hover:border-blue-300 transition duration-200">
                                 <div className="flex items-center justify-between mb-4">
@@ -151,20 +153,20 @@ export default function EnginesDir() {
                 {/* Popular Engines */}
                 <div className="border-t border-gray-200 pt-12">
                     <h2 className="text-2xl font-bold text-gray-900 mb-8 flex items-center">
-                        <Activity className="w-6 h-6 mr-2 text-blue-600" /> 
+                        <Activity className="w-6 h-6 mr-2 text-blue-600" />
                         Most Popular Diagnostics
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {displayPopular.map((engine: any) => {
-                             const id = engine.id || engine.engine_id;
-                             const name = engine.name || engine.engine_name;
-                             const microcopy = ENGINE_MICROCOPY[id] || DEFAULT_MICROCOPY;
-                             return (
+                            const id = engine.id || engine.engine_id;
+                            const name = engine.name || engine.engine_name;
+                            const microcopy = ENGINE_MICROCOPY[id] || DEFAULT_MICROCOPY;
+                            return (
                                 <Link key={id} href={`/go/${id}`} className="group block bg-white border border-gray-200 rounded-lg p-5 hover:border-blue-500 hover:ring-1 hover:ring-blue-500 transition flex flex-col h-full">
                                     <h3 className="font-bold text-gray-900 group-hover:text-blue-700">{name}</h3>
                                     <p className="text-sm text-gray-500 mt-1 line-clamp-2 flex-grow">{engine.shortDescription || engine.seo?.description}</p>
-                                    
-                                     {/* Added CTA + Microcopy */}
+
+                                    {/* Added CTA + Microcopy */}
                                     <div className="mt-4 pt-3 border-t border-gray-100">
                                         <span className="text-sm font-bold text-blue-600 flex items-center mb-1">
                                             Open Engine <ArrowRight className="ml-1 w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -174,7 +176,7 @@ export default function EnginesDir() {
                                         </p>
                                     </div>
                                 </Link>
-                             );
+                            );
                         })}
                     </div>
                 </div>
