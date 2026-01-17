@@ -70,12 +70,12 @@ export function Footer() {
                         </Link>
                     </div>
                     <div className="px-5 py-2">
-                        <Link href="https://www.smarthustlermarketing.com/privacy" className="text-base text-slate-500 hover:text-slate-900">
+                        <Link href="/privacy" className="text-base text-slate-500 hover:text-slate-900">
                             Privacy Policy
                         </Link>
                     </div>
                     <div className="px-5 py-2">
-                        <Link href="https://www.smarthustlermarketing.com/terms" className="text-base text-slate-500 hover:text-slate-900">
+                        <Link href="/terms" className="text-base text-slate-500 hover:text-slate-900">
                             Terms of Service
                         </Link>
                     </div>
