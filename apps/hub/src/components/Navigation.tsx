@@ -21,6 +21,9 @@ export function Navbar() {
                             <Link href="/engines" className="border-transparent text-slate-500 hover:text-slate-900 hover:border-slate-300 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                                 Directory
                             </Link>
+                            <Link href="/articles" className="border-transparent text-slate-500 hover:text-slate-900 hover:border-slate-300 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                                Knowledge Base
+                            </Link>
                             <Link href="/pricing" className="border-transparent text-slate-500 hover:text-slate-900 hover:border-slate-300 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                                 Pricing
                             </Link>
@@ -46,6 +49,7 @@ export function Navbar() {
                 <div className="sm:hidden">
                     <div className="pt-2 pb-3 space-y-1">
                         <Link href="/engines" className="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-slate-600 hover:bg-slate-50 hover:border-slate-300 hover:text-slate-800">Directory</Link>
+                        <Link href="/articles" className="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-slate-600 hover:bg-slate-50 hover:border-slate-300 hover:text-slate-800">Knowledge Base</Link>
                         <Link href="/pricing" className="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-slate-600 hover:bg-slate-50 hover:border-slate-300 hover:text-slate-800">Pricing</Link>
                         <Link href="/account" className="block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium text-slate-600 hover:bg-slate-50 hover:border-slate-300 hover:text-slate-800">Account</Link>
                     </div>
