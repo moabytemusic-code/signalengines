@@ -7,6 +7,7 @@
 - **Internal Engine Pages**: Added `apps/hub/src/app/engines/[slug]/page.tsx` to serve as a detail page for each engine, boosting SEO and user journey control.
 - **Production URLs**: API now serves `launchUrl` (e.g. `https://facebook.smarthustlermarketing.com`) to replace localhost links.
 - **SmartHustler Domain Support**: Updated CORS in API to allow requests from `*.smarthustlermarketing.com`.
+- **Sync Endpoint**: Added `GET /public/sync/engines` for SmartHustler integration.
 
 ### Changed
 - **Homepage**: "Popular Engines" now link directly to the production tools (external).
