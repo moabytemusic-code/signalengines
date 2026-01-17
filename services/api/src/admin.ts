@@ -139,6 +139,116 @@ adminRouter.use((req: AuthRequest, res, next) => {
     next();
 });
 
+// Batch Create Engines
+adminRouter.post("/engines/batch-create", async (req: AuthRequest, res) => {
+    const { engines, dry_run, overwrite, generate_pages, publish_pages } = req.body;
+    const results = [];
+    const generated_jobs = [];
+
+    if (!Array.isArray(engines)) {
+        return res.status(400).json({ error: "Engines must be an array" });
+    }
+
+    for (const item of engines) {
+        try {
+            let engineId = "";
+            let customConfig: any = null;
+
+            if (typeof item === 'string') {
+                engineId = item;
+            } else if (item && typeof item === 'object') {
+                engineId = item.engine_id || item.id;
+                customConfig = item;
+            }
+
+            if (!engineId) {
+                results.push({ success: false, error: "No engineId found", input: item });
+                continue;
+            }
+
+            // check if exists
+            const existing = await prisma.engineDefinition.findUnique({ where: { engineId } });
+            if (existing && !overwrite) {
+                results.push({ success: true, engineId, status: "exists", dry_run });
+                continue;
+            }
+
+            // Default Config (Merged with custom if provided)
+            const engineConfig = {
+                engine_id: engineId,
+                engine_name: customConfig?.engine_name || customConfig?.name || engineId.split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' '),
+                subdomain: customConfig?.subdomain || engineId.split('-')[0],
+                launchUrl: customConfig?.launchUrl || customConfig?.url || `https://${engineId}.signalengines.com`,
+                category: customConfig?.category || "Diagnostic",
+                primary_keyword: customConfig?.primary_keyword || engineId.replace(/-/g, ' '),
+                seo: {
+                    title: customConfig?.seo?.title || `${engineId} Dashboard`,
+                    description: customConfig?.seo?.description || `Instant diagnostic and fix plan for ${engineId}.`,
+                    h1: customConfig?.seo?.h1 || engineId
+                },
+                inputs: customConfig?.inputs || [],
+                scoring_rules: customConfig?.scoring_rules || { base_risk: 50 },
+                free_output_sections: [],
+                paid_output_sections: [],
+                pricing: { emergency: 0, full: 0, monthly: 0 },
+                cross_sell_engines: []
+            };
+
+            if (!dry_run) {
+                await prisma.engineDefinition.upsert({
+                    where: { engineId },
+                    update: {
+                        engineJson: JSON.stringify(engineConfig),
+                        updatedAt: new Date()
+                    },
+                    create: {
+                        engineId,
+                        engineJson: JSON.stringify(engineConfig),
+                        contentMapJson: "{}",
+                        status: "active",
+                        createdBy: req.user?.id
+                    }
+                });
+
+                if (generate_pages) {
+                    const job = await prisma.seoGenerationJob.create({
+                        data: {
+                            engineId,
+                            mode: 'standard_5',
+                            dryRun: false,
+                            overwrite: overwrite || false,
+                            status: 'PENDING',
+                            resultJson: '[]',
+                            createdBy: req.user?.id
+                        }
+                    });
+
+                    // Trigger Generation (this updates registry but gen runs as well)
+                    // We don't await gen here to keep batch responsive, but we collect jobId
+                    generateSeoPages(job.id).then(async () => {
+                        if (publish_pages) {
+                            await publishJob(job.id);
+                        }
+                    }).catch(console.error);
+
+                    generated_jobs.push({ engineId, jobId: job.id });
+                }
+            }
+
+            results.push({ success: true, engineId, dry_run, config_preview: engineConfig });
+
+        } catch (e: any) {
+            results.push({ success: false, engineId: item, error: e.message });
+        }
+    }
+
+    if (!dry_run) {
+        await engineRegistry.reload();
+    }
+
+    res.json({ success: true, results, generated_jobs });
+});
+
 // Basic Job Endpoints
 adminRouter.post("/seo/generate", async (req: AuthRequest, res) => {
     const { engine_id, mode, dry_run, overwrite } = req.body;
@@ -183,6 +293,35 @@ adminRouter.get("/seo/pages", async (req: AuthRequest, res) => {
         orderBy: { updatedAt: 'desc' }
     });
     res.json(pages);
+});
+
+adminRouter.post("/seo/pages/regenerate", async (req: AuthRequest, res) => {
+    const { engine_id, publish } = req.body;
+    if (!engine_id) return res.status(400).json({ error: "Missing engine_id" });
+
+    try {
+        const job = await prisma.seoGenerationJob.create({
+            data: {
+                engineId: engine_id,
+                mode: 'standard_5',
+                dryRun: false,
+                overwrite: true,
+                status: 'PENDING',
+                resultJson: '[]',
+                createdBy: req.user?.id
+            }
+        });
+
+        await generateSeoPages(job.id);
+
+        if (publish) {
+            await publishJob(job.id);
+        }
+
+        res.json({ success: true, job_id: job.id });
+    } catch (e: any) {
+        res.status(500).json({ error: e.message });
+    }
 });
 
 adminRouter.get("/seo/schedules", async (req: AuthRequest, res) => {
