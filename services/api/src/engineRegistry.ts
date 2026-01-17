@@ -36,6 +36,15 @@ class EngineRegistry {
                             try {
                                 const raw = fs.readFileSync(configPath, 'utf8');
                                 const json = JSON.parse(raw);
+
+                                // Dynamic Defaults for Legacy Engines
+                                if (!json.launchUrl && json.subdomain) {
+                                    json.launchUrl = `https://${json.subdomain}.signalengines.com`;
+                                }
+                                if (!json.category) json.category = "Utility";
+                                if (!json.status) json.status = "live";
+                                if (!json.accessTier) json.accessTier = "free";
+
                                 // We do a loose check or reuse Zod, but handle errors gracefully
                                 this.engines.set(json.engine_id, json);
 
@@ -75,6 +84,14 @@ class EngineRegistry {
                 try {
                     const engineData = JSON.parse(dbEngine.engineJson);
                     engineData.loadedFrom = "database"; // Tag it!
+
+                    // Dynamic Defaults
+                    if (!engineData.launchUrl && engineData.subdomain) {
+                        engineData.launchUrl = `https://${engineData.subdomain}.signalengines.com`;
+                    }
+                    if (!engineData.category) engineData.category = "Utility";
+                    if (!engineData.status) engineData.status = "live";
+
                     this.engines.set(dbEngine.engineId, engineData);
                     this.contentMaps.set(dbEngine.engineId, JSON.parse(dbEngine.contentMapJson));
                     console.log(`Loaded engine (DB): ${dbEngine.engineId}`);
