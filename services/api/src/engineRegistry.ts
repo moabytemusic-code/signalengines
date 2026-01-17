@@ -20,60 +20,46 @@ class EngineRegistry {
             path.join(__dirname, "../engines"),
         ];
 
-        let enginesDir = "";
+        const foundDirs: string[] = [];
+
         for (const p of pathsToTry) {
-            console.log(`Checking path: ${p} (Exists: ${fs.existsSync(p)})`);
-            if (fs.existsSync(p)) {
-                enginesDir = p;
-                console.log(`Found engines at: ${enginesDir}`);
-                break;
-            }
-        }
+            try {
+                if (fs.existsSync(p)) {
+                    console.log(`Scanning engines at path: ${p}`);
+                    foundDirs.push(p);
 
-        if (!enginesDir) {
-            console.error("CRITICAL: Engines directory not found! Tried: " + pathsToTry.join(", "));
-            // Fallback to avoid complete crash
-            enginesDir = path.join(process.cwd(), "engines");
-        }
+                    // Load from this directory
+                    const engineDirs = fs.readdirSync(p);
+                    for (const dir of engineDirs) {
+                        const configPath = path.join(p, dir, "engine.json");
+                        if (fs.existsSync(configPath)) {
+                            try {
+                                const raw = fs.readFileSync(configPath, 'utf8');
+                                const json = JSON.parse(raw);
+                                // We do a loose check or reuse Zod, but handle errors gracefully
+                                this.engines.set(json.engine_id, json);
 
+                                // Load content map if exists
+                                const mapPath = path.join(p, dir, "content_map.json");
+                                if (fs.existsSync(mapPath)) {
+                                    const mapRaw = fs.readFileSync(mapPath, 'utf8');
+                                    this.contentMaps.set(json.engine_id, JSON.parse(mapRaw));
+                                }
 
-        try {
-            // Note: We use a custom loading loop here to allow "partial success"
-            // If one engine is invalid, we don't want to crash the whole API.
-            // loadAllEngineConfigs in packages/engine-config currently throws on any error.
-            // We'll iterate manually.
-
-            if (fs.existsSync(enginesDir)) {
-                const engineDirs = fs.readdirSync(enginesDir);
-                for (const dir of engineDirs) {
-                    const configPath = path.join(enginesDir, dir, "engine.json");
-                    if (fs.existsSync(configPath)) {
-                        try {
-                            const raw = fs.readFileSync(configPath, 'utf8');
-                            const json = JSON.parse(raw);
-                            // We do a loose check or reuse Zod, but handle errors gracefully
-                            // For now, let's just parse JSON to avoid Zod strictness crashing everything if schema outdated
-                            this.engines.set(json.engine_id, json);
-
-                            // Load content map if exists
-                            const mapPath = path.join(enginesDir, dir, "content_map.json");
-                            if (fs.existsSync(mapPath)) {
-                                const mapRaw = fs.readFileSync(mapPath, 'utf8');
-                                this.contentMaps.set(json.engine_id, JSON.parse(mapRaw));
+                                console.log(`Loaded engine (FS): ${json.engine_id} from ${p}`);
+                            } catch (e: any) {
+                                console.error(`Failed to load engine ${dir} from ${p}: ${e.message}`);
                             }
-
-                            console.log(`Loaded engine (FS): ${json.engine_id}`);
-                        } catch (e: any) {
-                            console.error(`Failed to load engine ${dir}: ${e.message}`);
                         }
                     }
                 }
-            } else {
-                console.error("Engines directory somehow disappeared before loading.");
+            } catch (e) {
+                console.warn(`Error scanning path ${p}:`, e);
             }
+        }
 
-        } catch (error) {
-            console.error("FATAL: Disk Engine loading loop failed.", error);
+        if (foundDirs.length === 0) {
+            console.error("CRITICAL: No engines directory found! Tried: " + pathsToTry.join(", "));
         }
 
         // 2. Load from Database (Overrides FS)
