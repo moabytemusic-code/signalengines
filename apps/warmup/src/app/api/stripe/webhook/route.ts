@@ -63,5 +63,82 @@ export async function POST(req: Request) {
         }
     }
 
+    // Handle Subscription Cancellation / Deletion
+    if (event.type === 'customer.subscription.deleted') {
+        const subscription = event.data.object as Stripe.Subscription;
+        // Lookup user by customer ID is best, but we don't store it yet.
+        // We MUST fetch the customer to get the email to find the user.
+        const customerId = subscription.customer as string;
+        try {
+            const customer = await stripe.customers.retrieve(customerId) as Stripe.Customer;
+            if (customer.email) {
+                console.log(`📉 Subscription deleted for ${customer.email}. Downgrading...`);
+
+                const { error } = await supabase
+                    .from('users')
+                    .update({ subscription_status: 'free' })
+                    .eq('email', customer.email);
+
+                if (error) console.error('Error downgrading user:', error);
+
+                // Fetch User ID to update related email accounts
+                const { data: user } = await supabase.from('users').select('id').eq('email', customer.email).single();
+
+                if (user) {
+                    // Reset limits to Free tier
+                    await supabase
+                        .from('email_accounts')
+                        .update({ daily_limit: 5 })
+                        .eq('user_id', user.id);
+                }
+            }
+        } catch (e) {
+            console.error('Error handling subscription deletion:', e);
+        }
+    }
+
+    // Handle Subscription Update (Upgrades/Downgrades via Portal)
+    if (event.type === 'customer.subscription.updated') {
+        const subscription = event.data.object as Stripe.Subscription;
+        const priceId = subscription.items.data[0]?.price.id;
+
+        // Map Price ID back to Plan Name
+        let newPlan = 'free';
+        if (priceId === process.env.STRIPE_PRICE_ID_STARTER) newPlan = 'starter';
+        if (priceId === process.env.STRIPE_PRICE_ID_AGENCY) newPlan = 'agency';
+
+        // Only update if we matched a valid paid plan (otherwise it might be some other state)
+        if (newPlan !== 'free') {
+            const customerId = subscription.customer as string;
+            try {
+                const customer = await stripe.customers.retrieve(customerId) as Stripe.Customer;
+                if (customer.email) {
+                    console.log(`🔄 Subscription updated for ${customer.email} to ${newPlan}`);
+
+                    // Update User
+                    await supabase
+                        .from('users')
+                        .update({ subscription_status: newPlan })
+                        .eq('email', customer.email);
+
+                    // Map limits
+                    const dailyLimits: Record<string, number> = { 'starter': 50, 'agency': 200 };
+                    const newLimit = dailyLimits[newPlan] || 5;
+
+                    // We need the User ID to update accounts
+                    const { data: user } = await supabase.from('users').select('id').eq('email', customer.email).single();
+                    if (user) {
+                        await supabase
+                            .from('email_accounts')
+                            .update({ daily_limit: newLimit })
+                            .eq('user_id', user.id);
+                    }
+                }
+            } catch (e) {
+                console.error('Error handling subscription update:', e);
+            }
+        }
+    }
+
     return NextResponse.json({ received: true });
 }
