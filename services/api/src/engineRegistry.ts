@@ -13,13 +13,16 @@ class EngineRegistry {
 
         // More robust path resolution for Vercel vs Local
         const pathsToTry = [
-            path.join(process.cwd(), "engines"), // Root of the app folder
-            path.join(process.cwd(), "services/api/engines"), // Monorepo root
-            path.join(__dirname, "../engines"), // Relative to src
+            path.join(process.cwd(), "engines"),
+            path.join(process.cwd(), "../../engines"), // Monorepo root from service
+            path.join(__dirname, "../../../engines"), // From src/lib/.. or similar
+            path.join(process.cwd(), "services/api/engines"),
+            path.join(__dirname, "../engines"),
         ];
 
         let enginesDir = "";
         for (const p of pathsToTry) {
+            console.log(`Checking path: ${p} (Exists: ${fs.existsSync(p)})`);
             if (fs.existsSync(p)) {
                 enginesDir = p;
                 console.log(`Found engines at: ${enginesDir}`);
