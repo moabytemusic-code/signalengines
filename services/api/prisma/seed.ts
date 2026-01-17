@@ -45,7 +45,7 @@ async function main() {
                     const engineData = {
                         ...config,
                         subdomain: config.subdomain || engineId.split('-')[0],
-                        launchUrl: config.launchUrl || config.url || `https://${engineId}.signalengines.com`,
+                        launchUrl: config.launchUrl || config.url || (config.subdomain ? `https://${config.subdomain}.signalengines.com` : `https://${engineId}.signalengines.com`),
                         pricing: config.pricing || { emergency: 0, full: 0, monthly: 0 },
                         inputs: config.inputs || [],
                         scoring_rules: config.scoring_rules || { base_risk: 50 },
