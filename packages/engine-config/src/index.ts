@@ -46,11 +46,18 @@ export const EngineConfigSchema = z.object({
     secondary_keywords: z.array(z.string()),
     seo: EngineSeoSchema,
     inputs: z.array(EngineInputSchema),
-    scoring_rules: z.array(ScoringRuleSchema),
-    free_output_sections: z.array(z.string()),
-    paid_output_sections: z.array(z.string()),
-    pricing: EnginePricingSchema,
-    cross_sell_engines: z.array(z.string()),
+    scoring_rules: z.array(ScoringRuleSchema).or(z.object({ base_risk: z.number().optional() })).optional(),
+    free_output_sections: z.array(z.string()).optional(),
+    paid_output_sections: z.array(z.string()).optional(),
+    pricing: EnginePricingSchema.optional(),
+    cross_sell_engines: z.array(z.string()).optional(),
+
+    // New Standard Fields
+    category: z.string().optional(),
+    shortDescription: z.string().optional(),
+    status: z.string().optional(),
+    accessTier: z.string().optional(),
+    launchUrl: z.string().optional(),
 });
 
 // TypeScript Types derived from Zod
