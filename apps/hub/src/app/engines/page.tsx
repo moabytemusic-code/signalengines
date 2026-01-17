@@ -63,7 +63,17 @@ export default function EnginesDir() {
                 if (r.ok) {
                     const data = await r.json();
                     if (Array.isArray(data) && data.length > 0) {
-                        const apiIds = new Set(data.map((e: any) => e.engine_id || e.id)); const missing = ACTIVE_ENGINES.filter(e => !apiIds.has(e.id)).map(e => ({ engine_id: e.id, engine_name: e.name, category: e.category, shortDescription: e.shortDescription, accessTier: e.accessTier, launchUrl: e.launchUrl })); setEngines([...data, ...missing]);
+                        const apiIds = new Set(data.map((e: any) => e.engine_id || e.id));
+                        const missing = ACTIVE_ENGINES.filter(e => !apiIds.has(e.id)).map(e => ({
+                            engine_id: e.id,
+                            engine_name: e.name,
+                            category: e.category,
+                            shortDescription: e.shortDescription,
+                            accessTier: e.accessTier,
+                            launchUrl: e.launchUrl,
+                            status: e.status // Persist status!
+                        }));
+                        setEngines([...data, ...missing]);
                     }
                 }
             })
