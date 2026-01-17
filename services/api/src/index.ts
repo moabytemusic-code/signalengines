@@ -44,6 +44,7 @@ app.use(cors({
             allowedOrigins.includes(origin) ||
             /^https:\/\/.*\.signalengines\.com$/.test(origin) ||
             /^https:\/\/.*\.smarthustlermarketing\.com$/.test(origin) ||
+            origin === "https://smarthustlermarketing.com" ||
             /^https:\/\/.*\.vercel\.app$/.test(origin)
         ) {
             callback(null, true);
@@ -144,6 +145,28 @@ app.get("/public/engines/:id", (req, res) => {
     }
     const { scoring_rules, ...sanitized } = engine;
     res.json(sanitized);
+});
+
+app.get("/public/sync/engines", (req, res) => {
+    // Explicit endpoint for SmartHustler Sync
+    const engines = engineRegistry.list().map(e => ({
+        id: e.engine_id,
+        name: e.engine_name,
+        description: e.seo?.description || e.shortDescription,
+        category: (e as any).category,
+        url: (e as any).launchUrl || (e as any).url,
+        status: (e as any).status || "live",
+        images: {
+            // Placeholder for future logic if we want to serve dynamic OG images from here
+            og: `${process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.signalengines.com'}/public/og/${e.engine_id}.jpg`
+        }
+    }));
+
+    res.json({
+        synced_at: new Date().toISOString(),
+        count: engines.length,
+        engines
+    });
 });
 
 app.get("/public/articles", async (req, res) => {
