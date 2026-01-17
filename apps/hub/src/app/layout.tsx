@@ -7,7 +7,7 @@ import { Navbar, Footer } from "../components/Navigation";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Signal Engines Hub",
+  title: "Signal Engines | Smart Hustler AI Tools",
   description: "Directory of specialist traffic engines",
 };
 

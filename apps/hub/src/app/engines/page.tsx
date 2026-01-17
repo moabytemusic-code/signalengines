@@ -115,13 +115,22 @@ export default function EnginesDir() {
                         const link = `/go/${id}`;
                         const microcopy = ENGINE_MICROCOPY[id] || DEFAULT_MICROCOPY;
 
+                        const isLive = engine.status === 'live';
+                        const badgeColor = isLive ? 'text-green-600' : 'text-amber-600';
+                        const badgeIcon = isLive ? <Activity className="w-3 h-3 mr-1" /> : <Lock className="w-3 h-3 mr-1" />;
+                        const badgeText = isLive ? 'LIVE' : 'WAITLIST';
+                        const buttonText = isLive ? 'Open Engine' : 'Join Waitlist';
+                        const buttonClass = isLive
+                            ? "w-full flex items-center justify-center bg-gray-900 text-white font-bold py-2.5 rounded-lg hover:bg-black transition group"
+                            : "w-full flex items-center justify-center bg-amber-100 text-amber-900 font-bold py-2.5 rounded-lg hover:bg-amber-200 transition group";
+
                         return (
                             <div key={id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col hover:shadow-md hover:border-blue-300 transition duration-200">
                                 <div className="flex items-center justify-between mb-4">
                                     <div className="bg-slate-100 text-slate-700 text-xs font-bold uppercase tracking-wide px-2 py-1 rounded">
                                         {kw}
                                     </div>
-                                    <div className="flex items-center text-green-600 text-xs font-bold"><Activity className="w-3 h-3 mr-1" /> LIVE</div>
+                                    <div className={`flex items-center ${badgeColor} text-xs font-bold`}>{badgeIcon} {badgeText}</div>
                                 </div>
                                 <h3 className="text-xl font-bold text-gray-900 mb-2 truncate" title={name}>{name}</h3>
                                 <p className="text-gray-600 mb-6 flex-grow text-sm leading-relaxed line-clamp-3">{desc}</p>
@@ -129,9 +138,9 @@ export default function EnginesDir() {
                                 <div className="mt-auto pt-4 border-t border-gray-100">
                                     <Link
                                         href={link}
-                                        className="w-full flex items-center justify-center bg-gray-900 text-white font-bold py-2.5 rounded-lg hover:bg-black transition group"
+                                        className={buttonClass}
                                     >
-                                        Open Engine <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                        {buttonText} {isLive && <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />}
                                     </Link>
                                     <p className="text-center text-xs text-gray-400 mt-2 font-medium">
                                         {microcopy}
