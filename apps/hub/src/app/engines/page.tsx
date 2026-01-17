@@ -63,7 +63,21 @@ export default function EnginesDir() {
                 if (r.ok) {
                     const data = await r.json();
                     if (Array.isArray(data) && data.length > 0) {
-                        const apiIds = new Set(data.map((e: any) => e.engine_id || e.id));
+                        const localMap = new Map(ACTIVE_ENGINES.map(e => [e.id, e]));
+
+                        // Refine API data with local backups (e.g. status)
+                        const enhancedData = data.map((apiEngine: any) => {
+                            const id = apiEngine.engine_id || apiEngine.id;
+                            const local = localMap.get(id);
+                            return {
+                                ...apiEngine,
+                                // If API status is missing/null, fallback to local, else default to 'live' to avoid accidental waitlisting
+                                status: apiEngine.status || local?.status || 'live'
+                            };
+                        });
+
+                        const apiIds = new Set(enhancedData.map((e: any) => e.engine_id || e.id));
+
                         const missing = ACTIVE_ENGINES.filter(e => !apiIds.has(e.id)).map(e => ({
                             engine_id: e.id,
                             engine_name: e.name,
@@ -71,9 +85,10 @@ export default function EnginesDir() {
                             shortDescription: e.shortDescription,
                             accessTier: e.accessTier,
                             launchUrl: e.launchUrl,
-                            status: e.status // Persist status!
+                            status: e.status
                         }));
-                        setEngines([...data, ...missing]);
+
+                        setEngines([...enhancedData, ...missing]);
                     }
                 }
             })
