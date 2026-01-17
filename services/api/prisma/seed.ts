@@ -7,10 +7,11 @@ const prisma = new PrismaClient();
 async function main() {
     console.log('--- Dynamic Engine Seeding ---');
 
-    // Folders to scan
+    // Folders to scan - try both local to service and monorepo root
     const enginePaths = [
         path.join(process.cwd(), 'engines'),
-        path.join(process.cwd(), 'services/api/engines')
+        path.join(process.cwd(), '../../engines'), // Monorepo Root
+        path.join(__dirname, '../engines')
     ];
 
     const processedIds = new Set<string>();
