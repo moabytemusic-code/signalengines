@@ -77,6 +77,41 @@ async function main() {
     }
 
     console.log(`Seeding complete. Total engines: ${processedIds.size}`);
+
+    console.log('\n--- Initializing SEO Schedules ---');
+    for (const engineId of processedIds) {
+        const existing = await prisma.seoSchedule.findUnique({ where: { engineId } });
+        if (!existing) {
+            const dayOfWeek = Math.floor(Math.random() * 7);
+            const hour = 9 + Math.floor(Math.random() * 8);
+
+            const nextRun = new Date();
+            nextRun.setUTCHours(hour, 0, 0, 0);
+            const currentDay = nextRun.getUTCDay();
+            let diff = dayOfWeek - currentDay;
+            if (diff <= 0) diff += 7;
+            nextRun.setUTCDate(nextRun.getUTCDate() + diff);
+
+            await prisma.seoSchedule.create({
+                data: {
+                    engineId,
+                    isEnabled: true,
+                    dayOfWeek,
+                    hour,
+                    timezone: 'UTC',
+                    pagesPerRun: 1,
+                    autoPublish: true,
+                    dryRun: false,
+                    nextRunAt: nextRun,
+                    mode: 'standard_5',
+                    createdBy: 'system-seed'
+                }
+            });
+            console.log(`[INIT] Schedule created for: ${engineId}`);
+        } else {
+            console.log(`[SKIP] Schedule already exists for: ${engineId}`);
+        }
+    }
 }
 
 main()
