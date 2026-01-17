@@ -82,5 +82,17 @@ export const STATIC_ENGINES = [
         engine_name: "Ad Tracking & Attribution Fixer",
         primary_keyword: "fix pixel tracking",
         seo: { description: "Fix broken Facebook Pixels and conversion API events." }
+    },
+    {
+        engine_id: "tiktok-idea-batch",
+        engine_name: "TikTok Viral Idea Batch",
+        primary_keyword: "tiktok content ideas",
+        seo: { description: "Generate 10 viral video concepts tailored to your niche." }
+    },
+    {
+        engine_id: "tiktok-script-generator",
+        engine_name: "TikTok Script Generator",
+        primary_keyword: "tiktok script",
+        seo: { description: "Turn any idea into a viral script in seconds (Hook, Body, CTA)." }
     }
 ];

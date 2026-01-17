@@ -1,0 +1,42 @@
+{
+    "variants": [
+        "tiktok script template",
+        "viral reels script",
+        "short form video script",
+        "video content outline",
+        "high retention video hook"
+    ],
+    "immediate_actions": [
+        "Enter your video topic",
+        "Choose a high-energy tone",
+        "Generate your script draft",
+        "Trim the intro to under 3 seconds",
+        "Add a strong call to action"
+    ],
+    "mistakes": [
+        "Intro is too long",
+        "No clear CTA",
+        "Talking too fast or too slow",
+        "Poor lighting or sound quality"
+    ],
+    "causes": [
+        "Low retention at the 3-second mark",
+        "Missing visual cues",
+        "Lack of storytelling arc"
+    ],
+    "faqs": [
+        "How long should my TikTok script be?",
+        "How do I write a viral hook?",
+        "Should I use the script word-for-word?",
+        "Can I generate scripts for different tones?"
+    ],
+    "prevention": [
+        "Use the 3-second hook rule",
+        "Keep language simple and direct",
+        "End every video with a 'Follow for more' CTA"
+    ],
+    "related_engines": [
+        "tiktok-idea-batch",
+        "emailwarmup"
+    ]
+}
