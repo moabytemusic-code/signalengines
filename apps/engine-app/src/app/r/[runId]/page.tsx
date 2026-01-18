@@ -1,4 +1,13 @@
+"use client";
+
+import { useEffect, useState } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { apiClient } from '../../../lib/api';
+import { ResultsDisplay } from '../../../components/ResultsDisplay';
+import { GateModal } from '../../../components/GateModal';
+import { useAuth } from '../../../context/AuthContext';
 import { ArrowRight, Check, FileText, Loader2, Shield } from 'lucide-react';
+
 
 const RELATED_ENGINES: Record<string, string[]> = {
     fbadban: ['trackingfix', 'compliancealert'],
