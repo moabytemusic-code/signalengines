@@ -143,30 +143,129 @@ export function ResultsDisplay({ run }: ResultsProps) {
             {/* Paid Output (Gated) */}
             <div className="relative">
                 <div className={`transition-all duration-500 ${isLocked ? 'blur-md opacity-60 select-none' : ''}`}>
-                    <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                        <h3 className="text-lg font-bold text-slate-800 mb-4 border-b pb-2">Full Recovery Assets (Premium)</h3>
+                    <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
+
+                        {/* Premium Header */}
+                        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-6 md:p-8">
+                            <h3 className="text-2xl font-bold mb-2 flex items-center">
+                                <ShieldAlert className="mr-3 text-yellow-300" />
+                                Emergency Recovery Kit
+                            </h3>
+                            <p className="text-blue-100">
+                                Official templates, checklists, and guides to restore your status.
+                            </p>
+                        </div>
+
                         {isLocked ? (
-                            <div className="h-48 bg-slate-100 rounded animate-pulse">
-                                <div className="p-8 space-y-6">
-                                    <div className="flex items-center space-x-4">
-                                         <div className="w-12 h-12 bg-slate-200 rounded-full"></div>
-                                         <div className="h-4 bg-slate-200 rounded w-1/3"></div>
+                            // Locked State Placeholder
+                            <div className="bg-white p-6 md:p-8 h-96">
+                                <div className="space-y-8 animate-pulse">
+                                    <div className="space-y-4">
+                                        <div className="h-6 bg-slate-100 rounded w-1/4"></div>
+                                        <div className="h-4 bg-slate-100 rounded w-full"></div>
+                                        <div className="h-4 bg-slate-100 rounded w-5/6"></div>
                                     </div>
-                                    <div className="space-y-3">
-                                        <div className="h-3 bg-slate-200 rounded w-full"></div>
-                                        <div className="h-3 bg-slate-200 rounded w-5/6"></div>
-                                        <div className="h-3 bg-slate-200 rounded w-4/6"></div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="h-32 bg-slate-100 rounded"></div>
+                                        <div className="h-32 bg-slate-100 rounded"></div>
+                                    </div>
+                                    <div className="space-y-4">
+                                        <div className="h-4 bg-slate-100 rounded w-2/3"></div>
+                                        <div className="h-4 bg-slate-100 rounded w-1/2"></div>
                                     </div>
                                 </div>
                             </div>
                         ) : (
-                            <div className="prose max-w-none text-slate-700">
+                            // Unlocked State - Rich Kit Display
+                            <div className="p-6 md:p-8">
                                 {run.paid_output ? (
-                                    <pre className="bg-green-50 p-4 rounded-lg overflow-x-auto text-sm border border-green-100">
-                                        {JSON.stringify(run.paid_output, null, 2)}
-                                    </pre>
+                                    <div className="space-y-10">
+
+                                        {/* 1. Action Plan */}
+                                        {run.paid_output.action_plan && (
+                                            <section>
+                                                <h4 className="text-lg font-bold text-slate-900 mb-4 flex items-center">
+                                                    <span className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-3 text-sm">1</span>
+                                                    Your Action Plan
+                                                </h4>
+                                                <div className="prose prose-slate max-w-none text-slate-700 bg-slate-50 p-6 rounded-xl border border-slate-100">
+                                                    {Array.isArray(run.paid_output.action_plan)
+                                                        ? run.paid_output.action_plan.map((step: string, i: number) => (
+                                                            <div key={i} className="mb-2 flex items-start">
+                                                                <ArrowRight className="w-4 h-4 text-blue-500 mt-1 mr-2 flex-shrink-0" />
+                                                                <span>{step}</span>
+                                                            </div>
+                                                        ))
+                                                        : <p>{run.paid_output.action_plan}</p>
+                                                    }
+                                                </div>
+                                            </section>
+                                        )}
+
+                                        {/* 2. Appeal Templates */}
+                                        {run.paid_output.templates && (
+                                            <section>
+                                                <h4 className="text-lg font-bold text-slate-900 mb-4 flex items-center">
+                                                    <span className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center mr-3 text-sm">2</span>
+                                                    Copy-Paste Templates
+                                                </h4>
+                                                <div className="space-y-6">
+                                                    {run.paid_output.templates.map((tmpl: any, i: number) => (
+                                                        <div key={i} className="border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                                                            <div className="bg-slate-50 px-4 py-3 border-b border-slate-200 flex items-center justify-between">
+                                                                <span className="font-bold text-slate-700 text-sm uppercase tracking-wide">{tmpl.title || `Template #${i + 1}`}</span>
+                                                                <button
+                                                                    onClick={() => { navigator.clipboard.writeText(tmpl.content); alert('Copied to clipboard!'); }}
+                                                                    className="text-xs bg-white hover:bg-slate-100 border border-slate-300 text-slate-600 px-3 py-1 rounded-md font-medium transition-colors"
+                                                                >
+                                                                    Copy Text
+                                                                </button>
+                                                            </div>
+                                                            <div className="p-4 bg-white">
+                                                                <textarea
+                                                                    readOnly
+                                                                    className="w-full h-48 text-sm text-slate-600 font-mono p-4 bg-slate-50 border-0 rounded-lg focus:ring-0 resize-none selection:bg-indigo-100 selection:text-indigo-900"
+                                                                    defaultValue={tmpl.content}
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                                <p className="text-xs text-slate-500 mt-2 italic">Tip: Customize the bracketed text [like this] before sending.</p>
+                                            </section>
+                                        )}
+
+                                        {/* 3. Checklist */}
+                                        {run.paid_output.checklist && (
+                                            <section>
+                                                <h4 className="text-lg font-bold text-slate-900 mb-4 flex items-center">
+                                                    <span className="w-8 h-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center mr-3 text-sm">3</span>
+                                                    Compliance Checklist
+                                                </h4>
+                                                <div className="grid gap-3">
+                                                    {run.paid_output.checklist.map((item: string, i: number) => (
+                                                        <label key={i} className="flex items-start p-3 bg-white border border-slate-200 rounded-lg cursor-pointer hover:border-green-400 hover:bg-green-50/30 transition-all">
+                                                            <input type="checkbox" className="w-5 h-5 text-green-600 rounded border-gray-300 focus:ring-green-500 mt-0.5 mr-3" />
+                                                            <span className="text-slate-700">{item}</span>
+                                                        </label>
+                                                    ))}
+                                                </div>
+                                            </section>
+                                        )}
+
+                                        {/* Fallback for raw data if structured keys missing */}
+                                        {!run.paid_output.templates && !run.paid_output.checklist && !run.paid_output.action_plan && (
+                                            <div className="p-4 bg-yellow-50 text-yellow-800 rounded-lg text-sm border border-yellow-200">
+                                                <h5 className="font-bold mb-2">Raw Output Data</h5>
+                                                <pre className="overflow-x-auto whitespace-pre-wrap font-mono text-xs">{JSON.stringify(run.paid_output, null, 2)}</pre>
+                                            </div>
+                                        )}
+
+                                    </div>
                                 ) : (
-                                    <div className="text-slate-500 italic">No additional paid data generated for this run.</div>
+                                    <div className="text-slate-500 italic p-8 text-center bg-slate-50 rounded-lg border border-dashed border-slate-300">
+                                        No additional kit data was generated for this specific run.
+                                    </div>
                                 )}
                             </div>
                         )}
