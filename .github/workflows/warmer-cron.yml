@@ -2,22 +2,37 @@ name: Warmer Cron
 
 on:
   schedule:
-    # Run every 15 minutes
     - cron: '*/15 * * * *'
-  workflow_dispatch: # Allow manual trigger from GitHub UI
+  workflow_dispatch:
 
 jobs:
   warmup:
     runs-on: ubuntu-latest
     steps:
+      - name: Check Variables (Debug)
+        run: |
+          if [ -z "${{ secrets.APP_URL }}" ]; then
+            echo "ERROR: APP_URL secret is NOT set!"
+            exit 1
+          else
+            echo "SUCCESS: APP_URL is set (Length: ${#APP_URL})"
+          fi
+          
+          if [ -z "${{ secrets.CRON_SECRET }}" ]; then
+            echo "WARNING: CRON_SECRET is not set (endpoint might reject if protected)"
+          fi
+
       - name: Trigger Send Endpoint
         run: |
-          curl -X GET "${{ secrets.APP_URL }}/api/cron/send?secret=${{ secrets.CRON_SECRET }}" \
-          --fail \
-          --max-time 60
+          # We use quotes to prevent shell expansion issues
+          URL="${{ secrets.APP_URL }}/api/cron/send?secret=${{ secrets.CRON_SECRET }}"
+          echo "Targeting: ${{ secrets.APP_URL }}/api/cron/send..."
+          
+          curl -f -L --max-time 60 "$URL"
 
       - name: Trigger Process Endpoint
         run: |
-          curl -X GET "${{ secrets.APP_URL }}/api/cron/process?secret=${{ secrets.CRON_SECRET }}" \
-          --fail \
-          --max-time 60
+          URL="${{ secrets.APP_URL }}/api/cron/process?secret=${{ secrets.CRON_SECRET }}"
+          echo "Targeting: ${{ secrets.APP_URL }}/api/cron/process..."
+          
+          curl -f -L --max-time 60 "$URL"
