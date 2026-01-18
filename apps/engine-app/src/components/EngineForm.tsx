@@ -42,7 +42,7 @@ export function EngineForm({ config }: { config: EngineConfig }) {
                         </label>
                         {input.type === 'select' ? (
                             <select
-                                className="w-full p-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none"
+                                className="w-full p-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none text-slate-900"
                                 onChange={e => handleChange(input.id, e.target.value)}
                                 required={input.required}
                             >
@@ -55,7 +55,7 @@ export function EngineForm({ config }: { config: EngineConfig }) {
                             <input
                                 type={input.type}
                                 placeholder={input.placeholder}
-                                className="w-full p-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none"
+                                className="w-full p-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none text-slate-900"
                                 onChange={e => handleChange(input.id, e.target.value)}
                                 required={input.required}
                             />

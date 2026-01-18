@@ -63,6 +63,28 @@ export default function RunResultsPage() {
         return () => { polling = false; };
     }, [runId, authLoading, user, isSuccess]);
 
+    const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
+
+    const handleCheckout = async (product: string) => {
+        setCheckoutLoading(product);
+        try {
+            const returnUrl = `${window.location.origin}/r/${runId}?success=true`;
+            const res = await apiClient('/billing/checkout', {
+                method: 'POST',
+                body: JSON.stringify({
+                    engine_id: run.engine_id,
+                    product,
+                    success_url: returnUrl,
+                    cancel_url: returnUrl
+                })
+            });
+            window.location.href = res.checkout_url;
+        } catch (e: any) {
+            alert(e.message);
+            setCheckoutLoading(null);
+        }
+    };
+
     if (authLoading || loading) {
         return <div className="min-h-screen flex items-center justify-center"><Loader2 className="animate-spin text-blue-600" size={48} /></div>;
     }
@@ -93,43 +115,51 @@ export default function RunResultsPage() {
                         <h2 className="text-xl font-bold text-slate-800 mb-6">Recommended Recovery Paths</h2>
                         <div className="grid md:grid-cols-2 gap-6">
 
-                            {/* Option A: Toolkit ($19) */}
+                            {/* Option A: Emergency Kit ($7) */}
                             <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
                                 <div className="flex items-center justify-between mb-4">
                                     <div className="p-2 bg-blue-50 rounded-lg text-blue-600">
                                         <FileText size={24} />
                                     </div>
-                                    <span className="text-lg font-bold text-slate-900">$19</span>
+                                    <span className="text-lg font-bold text-slate-900">$7</span>
                                 </div>
-                                <h3 className="font-bold text-slate-900 mb-2">Recovery Toolkit</h3>
+                                <h3 className="font-bold text-slate-900 mb-2">Emergency Kit</h3>
                                 <p className="text-sm text-slate-500 mb-6">Want this in a clean, copy-paste format? Get the exact templates and checklists needed.</p>
                                 <ul className="space-y-2 mb-6">
                                     <li className="flex items-center text-sm text-slate-600"><Check size={16} className="text-green-500 mr-2" /> Appeal Templates</li>
                                     <li className="flex items-center text-sm text-slate-600"><Check size={16} className="text-green-500 mr-2" /> Compliance Checklist</li>
                                 </ul>
-                                <button className="w-full py-2 px-4 bg-white border border-blue-600 text-blue-600 font-semibold rounded-lg hover:bg-blue-50 transition-colors">
-                                    Get Toolkit
+                                <button
+                                    onClick={() => handleCheckout('emergency')}
+                                    disabled={!!checkoutLoading}
+                                    className="w-full py-2 px-4 bg-white border border-blue-600 text-blue-600 font-bold rounded-lg hover:bg-blue-50 transition-colors"
+                                >
+                                    {checkoutLoading === 'emergency' ? <Loader2 className="animate-spin mx-auto text-blue-600" /> : 'Get Kit'}
                                 </button>
                             </div>
 
-                            {/* Option B: Guided Fix ($49) */}
+                            {/* Option B: Full Recovery ($27) */}
                             <div className="bg-white border-2 border-blue-600 rounded-xl p-6 shadow-md relative overflow-hidden">
                                 <div className="absolute top-0 right-0 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">RECOMMENDED</div>
                                 <div className="flex items-center justify-between mb-4">
                                     <div className="p-2 bg-blue-100 rounded-lg text-blue-700">
                                         <Shield size={24} />
                                     </div>
-                                    <span className="text-lg font-bold text-slate-900">$49</span>
+                                    <span className="text-lg font-bold text-slate-900">$27</span>
                                 </div>
-                                <h3 className="font-bold text-slate-900 mb-2">Guided Repair</h3>
-                                <p className="text-sm text-slate-500 mb-6">Follow step-by-step with guided prompts to ensure you don't miss a critical detail.</p>
+                                <h3 className="font-bold text-slate-900 mb-2">Full Recovery</h3>
+                                <p className="text-sm text-slate-500 mb-6">Lifetime access with guided prompts to ensure you don't miss a critical detail.</p>
                                 <ul className="space-y-2 mb-6">
                                     <li className="flex items-center text-sm text-slate-600"><Check size={16} className="text-green-500 mr-2" /> Interactive Walkthrough</li>
                                     <li className="flex items-center text-sm text-slate-600"><Check size={16} className="text-green-500 mr-2" /> Confirmation Checkpoints</li>
                                     <li className="flex items-center text-sm text-slate-600"><Check size={16} className="text-green-500 mr-2" /> Priority Support</li>
                                 </ul>
-                                <button className="w-full py-2 px-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-sm">
-                                    Start Guided Fix
+                                <button
+                                    onClick={() => handleCheckout('full')}
+                                    disabled={!!checkoutLoading}
+                                    className="w-full py-2 px-4 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
+                                >
+                                    {checkoutLoading === 'full' ? <Loader2 className="animate-spin mx-auto text-white" /> : 'Get Full Access'}
                                 </button>
                             </div>
                         </div>
@@ -149,8 +179,12 @@ export default function RunResultsPage() {
                             </div>
                             <div className="flex items-center gap-4">
                                 <span className="text-2xl font-bold">$29<span className="text-sm font-normal text-slate-400">/mo</span></span>
-                                <button className="py-2 px-6 bg-green-500 hover:bg-green-600 text-white font-bold rounded-lg transition-colors">
-                                    Enable Protection
+                                <button
+                                    onClick={() => handleCheckout('monthly')}
+                                    disabled={!!checkoutLoading}
+                                    className="py-2 px-6 bg-green-500 hover:bg-green-600 text-white font-bold rounded-lg transition-colors"
+                                >
+                                    {checkoutLoading === 'monthly' ? <Loader2 className="animate-spin mx-auto text-gray-800" /> : 'Enable Protection'}
                                 </button>
                             </div>
                         </div>
