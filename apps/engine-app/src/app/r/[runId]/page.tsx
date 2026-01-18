@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { apiClient } from '../../../lib/api';
 import { ResultsDisplay } from '../../../components/ResultsDisplay';
 import { GateModal } from '../../../components/GateModal';
@@ -26,14 +26,42 @@ export default function RunResultsPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
+    const searchParams = useSearchParams();
+    const isSuccess = searchParams.get('success') === 'true';
+
     useEffect(() => {
         if (!runId || authLoading) return;
 
-        apiClient(`/runs/${runId}`)
-            .then(data => setRun(data))
-            .catch(err => setError(err.message))
-            .finally(() => setLoading(false));
-    }, [runId, authLoading, user]);
+        let polling = isSuccess;
+        const fetchRun = async () => {
+            try {
+                const data = await apiClient(`/runs/${runId}`);
+                setRun(data);
+                // If we are polling and access is confirmed, stop polling
+                if (data?.access?.premium) {
+                    polling = false;
+                }
+                // If we are polling and not yet verified, schedule next poll
+                if (polling) {
+                    setTimeout(fetchRun, 2000);
+                }
+            } catch (err: any) {
+                setError(err.message);
+                polling = false;
+            } finally {
+                if (!polling) setLoading(false);
+            }
+        };
+
+        fetchRun();
+
+        // Stop polling after 15s to avoid infinite loop
+        if (isSuccess) {
+            setTimeout(() => { polling = false; setLoading(false); }, 15000);
+        }
+
+        return () => { polling = false; };
+    }, [runId, authLoading, user, isSuccess]);
 
     if (authLoading || loading) {
         return <div className="min-h-screen flex items-center justify-center"><Loader2 className="animate-spin text-blue-600" size={48} /></div>;

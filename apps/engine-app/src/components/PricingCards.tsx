@@ -15,7 +15,7 @@ export function PricingCards({ engineId, runId }: PricingProps) {
     const handleCheckout = async (product: string) => {
         setLoading(product);
         try {
-            const returnUrl = `${window.location.origin}/r/${runId}`;
+            const returnUrl = `${window.location.origin}/r/${runId}?success=true`;
             const res = await apiClient('/billing/checkout', {
                 method: 'POST',
                 body: JSON.stringify({
