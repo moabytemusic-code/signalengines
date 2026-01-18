@@ -27,6 +27,9 @@ export function Navbar() {
                             <Link href="/pricing" className="border-transparent text-slate-500 hover:text-slate-900 hover:border-slate-300 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                                 Pricing
                             </Link>
+                            <a href="http://localhost:3000" target="_blank" rel="noopener noreferrer" className="border-transparent text-slate-500 hover:text-orange-600 hover:border-orange-300 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                                Warmup Hero
+                            </a>
                         </div>
                     </div>
                     <div className="hidden sm:ml-6 sm:flex sm:items-center">
