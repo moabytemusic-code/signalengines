@@ -181,19 +181,7 @@ export async function executeEngineRun(
     return run;
 }
 
-// 4. Track Event
-await prisma.event.create({
-    data: {
-        type: "scan_completed",
-        engineId: engine.engine_id,
-        userId: userId || null,
-        anonymousId: userId ? null : anonymousId,
-        meta: JSON.stringify({ runId: run.id })
-    }
-});
 
-return run;
-}
 
 export async function getRun(runId: string, user?: any, anonymousId?: string) {
     const run = await prisma.engineRun.findUnique({
