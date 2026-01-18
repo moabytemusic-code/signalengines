@@ -95,6 +95,13 @@ const ENGINE_STEPS: Record<string, { title: string, desc: string }[]> = {
   ]
 };
 
+const DEFAULT_MICROCOPY = "Answer a few questions to get clear next steps.";
+const DEFAULT_STEPS = [
+  { title: "Input Details", desc: "Provide basic context about your specific issue." },
+  { title: "Run Analysis", desc: "We compare your data against known benchmarks." },
+  { title: "Get Fix Plan", desc: "Receive instant steps to resolve the problem." }
+];
+
 // 3. Fallback Data for CRO Elements
 const TRUST_INDICATORS = [
   { icon: "⏱", text: "Takes about 2–5 minutes" },
