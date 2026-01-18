@@ -1,7 +1,10 @@
 import "dotenv/config";
 import Stripe from "stripe";
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "sk_test_mock", {
+const key = process.env.STRIPE_SECRET_KEY;
+console.log("Stripe Key Loaded:", key ? `Found (${key.substring(0, 8)}...)` : "MISSING", " from dotenv:", !!process.env.STRIPE_SECRET_KEY);
+
+export const stripe = new Stripe(key || "sk_test_mock", {
     apiVersion: "2025-12-15.clover",
     typescript: true
 });
