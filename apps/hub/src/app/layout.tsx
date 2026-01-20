@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   title: "Signal Engines | Smart Hustler AI Tools",
   description: "Directory of specialist traffic engines",
   verification: {
-    google: "google0fca4824c5d023c7",
+    google: "l_Z7qzfNPz6XCuyQl4kMVyW4b9G5BI9ZHNM1xv87b8Q",
   },
 };
 
