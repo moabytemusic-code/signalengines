@@ -9,6 +9,9 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Signal Engines | Smart Hustler AI Tools",
   description: "Directory of specialist traffic engines",
+  verification: {
+    google: "google0fca4824c5d023c7",
+  },
 };
 
 export default function RootLayout({
