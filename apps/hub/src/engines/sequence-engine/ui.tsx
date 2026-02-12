@@ -51,6 +51,16 @@ export default function SequenceEngineUI() {
                 body: JSON.stringify(formData)
             });
 
+            const contentType = res.headers.get("content-type");
+            if (!contentType || !contentType.includes("application/json")) {
+                const text = await res.text();
+                if (res.status === 401 || res.status === 403) {
+                    setError("Unauthorized. Please log in.");
+                    return;
+                }
+                throw new Error(`Server Error (${res.status}): ${text.substring(0, 100)}`);
+            }
+
             const data = await res.json();
 
             if (!res.ok) {
