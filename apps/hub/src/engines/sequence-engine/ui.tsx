@@ -16,18 +16,19 @@ interface SequenceOutput {
 }
 
 export default function SequenceEngineUI() {
+    console.log("UI Version: 1.0.2 - Debugging JSON Error"); // DEBUG LINE
+
     const { user } = useAuth();
     const [loading, setLoading] = useState(false);
     const [output, setOutput] = useState<SequenceOutput | null>(null);
     const [usage, setUsage] = useState({ current: 0, limit: 3 });
-    const [tier, setTier] = useState<'free' | 'pro'>('free'); // Default to free until loaded
+    const [tier, setTier] = useState<'free' | 'pro'>('free');
 
-    // Form State
     const [formData, setFormData] = useState({
         niche: '',
         offer_type: '',
         target_audience: '',
-        traffic_source: 'LinkedIn', // Default
+        traffic_source: 'LinkedIn',
         goal: 'Reply',
         tone: 'Professional',
         personalization_signals: ''
@@ -45,15 +46,20 @@ export default function SequenceEngineUI() {
         setLoading(true);
         setError('');
         try {
+            console.log("Sending request to /api/engines/sequence-engine/run");
             const res = await fetch('/api/engines/sequence-engine/run', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)
             });
 
+            console.log("Response received:", res.status, res.statusText);
             const contentType = res.headers.get("content-type");
+            console.log("Content-Type:", contentType);
+
             if (!contentType || !contentType.includes("application/json")) {
                 const text = await res.text();
+                console.error("Non-JSON response body:", text);
                 if (res.status === 401 || res.status === 403) {
                     setError("Unauthorized. Please log in.");
                     return;
@@ -61,7 +67,14 @@ export default function SequenceEngineUI() {
                 throw new Error(`Server Error (${res.status}): ${text.substring(0, 100)}`);
             }
 
-            const data = await res.json();
+            const text = await res.text(); // Read as text first to debug
+            console.log("Raw Response Body:", text);
+
+            if (!text) {
+                throw new Error("Empty response body received from server.");
+            }
+
+            const data = JSON.parse(text);
 
             if (!res.ok) {
                 if (res.status === 403 && data.upgradeRequired) {
@@ -76,6 +89,7 @@ export default function SequenceEngineUI() {
                 }
             }
         } catch (e: any) {
+            console.error("Fetch Error:", e);
             setError(e.message);
         } finally {
             setLoading(false);
