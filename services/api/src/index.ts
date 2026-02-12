@@ -17,9 +17,23 @@ dotenv.config();
 
 
 // Initialize Registry
+import { PathRegistry } from "@signalengines/engine-config";
+import { BuyerIntentPath } from "./paths/BuyerIntentPath";
+
+import { CompetitorLeakPath } from "./paths/CompetitorLeakPath";
+import { AffiliateLeadPath } from "./paths/AffiliateLeadPath";
+import { OfferMatchPath } from "./paths/OfferMatchPath";
+
 (async () => {
     try {
         await engineRegistry.initialize();
+
+        // Register Paths
+        PathRegistry.register(new BuyerIntentPath());
+        PathRegistry.register(new CompetitorLeakPath());
+        PathRegistry.register(new AffiliateLeadPath());
+        PathRegistry.register(new OfferMatchPath());
+        console.log("Path Engines Registered: ", PathRegistry.list().map(p => p.id));
     } catch (e) {
         console.error("FATAL: Engine Registry initialization failed on boot.", e);
     }

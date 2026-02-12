@@ -50,6 +50,7 @@ export const EngineConfigSchema = z.object({
     free_output_sections: z.array(z.string()).optional(),
     paid_output_sections: z.array(z.string()).optional(),
     pricing: EnginePricingSchema.optional(),
+    paths: z.array(z.string()).optional(),
     cross_sell_engines: z.array(z.string()).optional(),
 
     // New Standard Fields
@@ -101,3 +102,4 @@ export function listEngineIds(enginesRootDir: string): string[] {
     const configs = loadAllEngineConfigs(enginesRootDir);
     return Object.keys(configs);
 }
+export * from "./paths";

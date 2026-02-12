@@ -32,6 +32,13 @@ model User {
   entitlement   Entitlement?
   engineEntitlements EngineEntitlement[]
   hasAgencyAccess Boolean @default(false)
+  
+  // Sequence Engine (Added)
+  tier                   String    @default("free")
+  billingProvider        String?   // 'gumroad', 'stripe'
+  billingSubscriptionId  String?
+  usageCounters          UsageCounter[]
+  sequences              Sequence[]
 }
 
 model Session {
@@ -216,4 +223,29 @@ model SeoScheduleRun {
   createdAt      DateTime @default(now())
   
   schedule       SeoSchedule @relation(fields: [scheduleId], references: [id])
+}
+
+// Sequence Engine Models
+model UsageCounter {
+  id          String   @id @default(cuid())
+  userId      String
+  engineId    String
+  periodStart DateTime
+  periodEnd   DateTime
+  count       Int      @default(0)
+  
+  user        User     @relation(fields: [userId], references: [id])
+  
+  @@unique([userId, engineId])
+}
+
+model Sequence {
+  id          String   @id @default(cuid())
+  userId      String
+  engineId    String   @default("sequence-engine")
+  inputs      Json
+  output      Json
+  createdAt   DateTime @default(now())
+  
+  user        User     @relation(fields: [userId], references: [id])
 }

@@ -10,7 +10,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Call API Tick
+        env:
+          RUN_APP_URL: ${{ secrets.APP_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
-          curl -X POST "${{ secrets.API_BASE_URL || 'https://api.signalengines.com' }}/admin/seo/scheduler/tick" \
-          -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+          # Use secret if set, otherwise default to prod
+          # This avoids linter warnings about complex secret expressions
+          TARGET_URL="${RUN_APP_URL:-https://api.signalengines.com}"
+          
+          curl -X POST "${TARGET_URL}/admin/seo/scheduler/tick" \
+          -H "Authorization: Bearer $CRON_SECRET" \
           -H "Content-Type: application/json"

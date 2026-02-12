@@ -270,29 +270,155 @@ export function ResultsDisplay({ run }: ResultsProps) {
                             </div>
                         )}
                     </div>
-                </div>
+                        )}
 
-                {isLocked && (
-                    <div className="absolute inset-0 flex items-center justify-center z-10 pt-12">
-                        <div className="text-center bg-white/95 backdrop-blur-sm p-8 rounded-2xl shadow-xl border border-blue-100 max-w-md mx-4">
-                            <div className="bg-blue-50 p-4 rounded-full shadow-inner inline-block mb-4">
-                                <Lock className="text-blue-600" size={32} />
+                    {/* ------------------------------------------------------------------ */}
+                    {/* 4. NEW PATH ENGINE RESULTS DISPLAY */}
+                    {/* ------------------------------------------------------------------ */}
+                    {run.paid_output && run.paid_output.path_results && Object.keys(run.paid_output.path_results).length > 0 && (
+                        <section className="bg-slate-50 border-t border-slate-200 p-8">
+                            <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center">
+                                <Activity className="w-6 h-6 mr-3 text-purple-600" />
+                                Demand & Monetization Paths
+                            </h3>
+
+                            <div className="space-y-8">
+                                {Object.entries(run.paid_output.path_results).map(([pathId, result]: [string, any]) => (
+                                    <div key={pathId} className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                                        {/* Path Header */}
+                                        <div className="bg-slate-100 px-6 py-3 border-b border-slate-200 flex justify-between items-center">
+                                            <div className="flex items-center">
+                                                <span className="w-2 h-8 bg-purple-500 rounded-full mr-3"></span>
+                                                <h4 className="font-bold text-slate-800 uppercase tracking-wide text-sm">{pathId.replace(/_/g, " ")}</h4>
+                                            </div>
+                                            {result.monetization && (
+                                                <div className="flex items-center space-x-2 text-green-700 bg-green-50 px-3 py-1 rounded-full border border-green-200 text-xs font-bold">
+                                                    <span>Est. Value:</span>
+                                                    <span>{result.monetization.currency} {result.monetization.value}</span>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Path Body */}
+                                        <div className="p-6">
+
+                                            {/* Buyer Intent Data */}
+                                            {result.data.outline && (
+                                                <div className="mb-6">
+                                                    <h5 className="font-bold text-slate-700 mb-2">Content Outline ({result.data.intent})</h5>
+                                                    <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 text-sm">
+                                                        <div className="font-bold text-lg mb-2">{result.data.outline.h1}</div>
+                                                        <ul className="list-disc list-inside space-y-1 text-slate-600">
+                                                            {result.data.outline.sections.map((s: any, i: number) => (
+                                                                <li key={i}>{s.h2}</li>
+                                                            ))}
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* Competitor / Leads Data */}
+                                            {result.data.sources && (
+                                                <div className="mb-6">
+                                                    <h5 className="font-bold text-slate-700 mb-2">Detailed Signal Sources</h5>
+                                                    <ul className="space-y-2">
+                                                        {result.data.sources.slice(0, 3).map((s: any, i: number) => (
+                                                            <li key={i} className="flex items-center text-sm text-slate-600">
+                                                                <ArrowRight className="w-3 h-3 text-purple-400 mr-2" />
+                                                                <a href={s.url} target="_blank" className="hover:text-purple-600 underline truncate max-w-xs">{s.url}</a>
+                                                                <span className="ml-2 text-xs text-slate-400">({s.source_type})</span>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            )}
+
+                                            {/* Leads Data */}
+                                            {result.data.leads && (
+                                                <div className="mb-6">
+                                                    <h5 className="font-bold text-slate-700 mb-2">Verified Leads ({result.data.count})</h5>
+                                                    <div className="overflow-x-auto">
+                                                        <table className="min-w-full text-sm text-left">
+                                                            <thead className="bg-slate-50 text-slate-500 font-medium">
+                                                                <tr>
+                                                                    <th className="px-3 py-2">Name</th>
+                                                                    <th className="px-3 py-2">Source</th>
+                                                                    <th className="px-3 py-2">Status</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                {result.data.leads.slice(0, 5).map((l: any, i: number) => (
+                                                                    <tr key={i} className="border-t border-slate-100">
+                                                                        <td className="px-3 py-2">{l.contact?.name || "N/A"}</td>
+                                                                        <td className="px-3 py-2 truncate max-w-[100px]">{l.url}</td>
+                                                                        <td className="px-3 py-2">
+                                                                            {l.contact?.verified ?
+                                                                                <span className="text-green-600 font-bold text-xs">Verified</span> :
+                                                                                <span className="text-slate-400 text-xs">Unknown</span>
+                                                                            }
+                                                                        </td>
+                                                                    </tr>
+                                                                ))}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* Recommended Offers */}
+                                            {result.monetization && result.monetization.offers && result.monetization.offers.length > 0 && (
+                                                <div className="mt-6 border-t border-slate-100 pt-4">
+                                                    <h5 className="font-bold text-slate-700 mb-3 text-xs uppercase tracking-wider">Monetization Opportunities</h5>
+                                                    <div className="grid gap-3 sm:grid-cols-2">
+                                                        {result.monetization.offers.map((offer: any, i: number) => (
+                                                            <a key={i} href={offer.link || "#"} target="_blank" className="block group">
+                                                                <div className={`p-3 rounded-lg border transition-all ${offer.type === 'Internal' ? 'bg-amber-50 border-amber-200 hover:border-amber-400' : 'bg-white border-slate-200 hover:border-purple-300'}`}>
+                                                                    <div className="flex justify-between items-start">
+                                                                        <div>
+                                                                            <div className="font-bold text-slate-900 group-hover:text-purple-700 transition-colors">{offer.name}</div>
+                                                                            <div className="text-xs text-slate-500 mt-1">{offer.type} Offer</div>
+                                                                        </div>
+                                                                        {offer.payout && <div className="font-mono font-bold text-green-600 text-sm bg-white px-2 py-1 rounded shadow-sm">{offer.payout}</div>}
+                                                                    </div>
+                                                                </div>
+                                                            </a>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* Result Meta / Debug */}
+                                            {/* <pre className="text-xs text-slate-300 mt-4">{JSON.stringify(result.meta, null, 2)}</pre> */}
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
-                            <h3 className="text-2xl font-black text-slate-900 mb-3">Unlock Full Plan</h3>
-                            <p className="text-slate-600 mb-8 leading-relaxed">
-                                Get the complete templates, scripts, and official links needed to execute the fix safely.
-                            </p>
-                            <Link
-                                href={`/upgrade?engine_id=${run.engine_id}&run_id=${run.run_id}`}
-                                className="w-full block bg-gray-900 hover:bg-black text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center group"
-                            >
-                                Get Instant Access <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
-                            </Link>
-                            <p className="text-xs text-slate-400 mt-4">Safe & Secure Payment • Money-back Guarantee</p>
-                        </div>
-                    </div>
-                )}
+                        </section>
+                    )}
+                </div>
             </div>
+
+            {isLocked && (
+                <div className="absolute inset-0 flex items-center justify-center z-10 pt-12">
+                    <div className="text-center bg-white/95 backdrop-blur-sm p-8 rounded-2xl shadow-xl border border-blue-100 max-w-md mx-4">
+                        <div className="bg-blue-50 p-4 rounded-full shadow-inner inline-block mb-4">
+                            <Lock className="text-blue-600" size={32} />
+                        </div>
+                        <h3 className="text-2xl font-black text-slate-900 mb-3">Unlock Full Plan</h3>
+                        <p className="text-slate-600 mb-8 leading-relaxed">
+                            Get the complete templates, scripts, and official links needed to execute the fix safely.
+                        </p>
+                        <Link
+                            href={`/upgrade?engine_id=${run.engine_id}&run_id=${run.run_id}`}
+                            className="w-full block bg-gray-900 hover:bg-black text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center justify-center group"
+                        >
+                            Get Instant Access <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
+                        </Link>
+                        <p className="text-xs text-slate-400 mt-4">Safe & Secure Payment • Money-back Guarantee</p>
+                    </div>
+                </div>
+            )}
         </div>
+        </div >
     );
 }

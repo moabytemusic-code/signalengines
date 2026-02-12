@@ -1,5 +1,5 @@
 import { prisma } from "./lib/db";
-import { EngineConfig } from "@signalengines/engine-config";
+import { EngineConfig, PathRegistry, PathContext, PathResult } from "@signalengines/engine-config";
 
 // Helper to check daily limit
 export async function checkRateLimit(engineId: string, userId?: string, anonymousId?: string) {
@@ -149,6 +149,66 @@ export async function executeEngineRun(
 
     const paidOutput = sim.paid || DEFAULT_PAID_CONTENT;
 
+    // 3. Execute Paths (if any)
+    const pathResults: Record<string, PathResult> = {};
+    const enabledPaths = engine.paths || [];
+
+    // Allow input to override/add paths if needed (e.g. checkbox in UI)
+    if (inputs?.enabledPaths && Array.isArray(inputs.enabledPaths)) {
+        // Merge or replace based on logic. For now, let's append unique.
+        const inputPaths = inputs.enabledPaths as string[];
+        inputPaths.forEach(p => {
+            if (!enabledPaths.includes(p)) enabledPaths.push(p);
+        });
+    }
+
+    if (enabledPaths.length > 0) {
+        // Context for paths
+        const context: PathContext = {
+            signal: inputs,
+            config: engine,
+            user: user,
+            previousResults: pathResults
+        };
+
+        for (const pathId of enabledPaths) {
+            const pathEngine = PathRegistry.get(pathId);
+            if (pathEngine) {
+                try {
+                    if (pathEngine.canHandle(context)) {
+                        const result = await pathEngine.execute(context);
+                        pathResults[pathId] = result;
+                        // Update context for next path in chain
+                        context.previousResults = { ...pathResults };
+
+                        // CREDIT DEDUCTION LOGIC
+                        if (pathId === "affiliate_lead_path" && result.data?.count > 0 && user) {
+                            // Example: 1 credit per lead
+                            const cost = result.data.count;
+                            console.log(`[Billing] Deducting ${cost} credits for ${pathId} from User ${user.id}`);
+                            // await prisma.user.update({ where: { id: user.id }, data: { credits: { decrement: cost } } });
+                        }
+                    }
+                } catch (error) {
+                    console.error(`Path ${pathId} failed:`, error);
+                    pathResults[pathId] = {
+                        data: null,
+                        meta: { error: String(error) }
+                    };
+                }
+            } else {
+                console.warn(`Path engine ${pathId} not found in registry.`);
+            }
+        }
+    }
+
+    // Merge path results into paidOutput or keep separate?
+    // For now, attach to a new field 'path_results' in the JSON
+    const finalPaidOutput = {
+        ...paidOutput,
+        path_results: pathResults
+    };
+
     // 3. Persist
     const run = await prisma.engineRun.create({
         data: {
@@ -160,7 +220,7 @@ export async function executeEngineRun(
             output: {
                 create: {
                     freeOutput: JSON.stringify(freeOutput),
-                    paidOutput: JSON.stringify(paidOutput)
+                    paidOutput: JSON.stringify(finalPaidOutput)
                 }
             }
         },

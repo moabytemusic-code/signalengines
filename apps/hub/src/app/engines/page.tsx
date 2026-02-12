@@ -1,11 +1,13 @@
+
 "use client";
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { ArrowRight, Search, Activity, Shield, DollarSign, Lock, AlertTriangle } from "lucide-react";
+import { getAllEngines } from '../../engines/registry';
 
-// 1. Local Registry Fallback (Single Source of Truth)
-const ACTIVE_ENGINES = [
+// 1. Local Registry (Legacy)
+const LEGACY_ENGINES = [
     { id: "emailwarmup", name: "Email Reputation Checker", category: "Deliverability", shortDescription: "Check for blacklists and low sender reputation scores.", status: "live", accessTier: "free", launchUrl: "https://warmup.signalengines.com" },
     { id: "tiktok-idea-batch", name: "TikTok Viral Idea Batch", category: "Growth", shortDescription: "Generate 10 viral video concepts tailored to your niche.", status: "live", accessTier: "free", launchUrl: "https://ideas.signalengines.com" },
     { id: "tiktok-script-generator", name: "TikTok Script Generator", category: "Growth", shortDescription: "Turn any idea into a viral script in seconds (Hook, Body, CTA).", status: "live", accessTier: "free", launchUrl: "https://scripts.signalengines.com" },
@@ -25,8 +27,22 @@ const ACTIVE_ENGINES = [
     { id: "gbpsuspend", name: "Google Business Profile Suspended", category: "Local SEO", shortDescription: "Restore your local business listing on Google Maps.", status: "live", accessTier: "free", launchUrl: "https://gbpsuspend.signalengines.com" }
 ];
 
+// Combine with Modular Engines
+const MODULAR_ENGINES = getAllEngines().map(e => ({
+    id: e.id,
+    name: e.name,
+    category: "Marketing",
+    shortDescription: e.tagline,
+    status: "live",
+    accessTier: "freemium",
+    launchUrl: e.route
+}));
+
+const ACTIVE_ENGINES = [...MODULAR_ENGINES, ...LEGACY_ENGINES];
+
 // Micro-copy Mapping
 const ENGINE_MICROCOPY: Record<string, string> = {
+    "sequence-engine": "Generate cold outreach in 30s.",
     "emailwarmup": "See if you are landing in spam.",
     "tiktok-idea-batch": "Unlock 10 viral concepts in 30s.",
     "tiktok-script-generator": "Get a full script in 5 seconds.",
@@ -48,7 +64,7 @@ const ENGINE_MICROCOPY: Record<string, string> = {
 const DEFAULT_MICROCOPY = "Takes about 2–5 minutes.";
 
 // Popular Selection Order
-const POPULAR_IDS = ["fbadban", "gbpsuspend", "trackingfix", "emailspam", "compliancealert", "amazonsuspend"];
+const POPULAR_IDS = ["sequence-engine", "fbadban", "gbpsuspend", "trackingfix", "emailspam", "compliancealert", "amazonsuspend"];
 
 export default function EnginesDir() {
     // 2. Initialize with Fallback (Never Empty)
@@ -137,7 +153,7 @@ export default function EnginesDir() {
                         const name = engine.name || engine.engine_name;
                         const desc = engine.shortDescription || engine.seo?.description;
                         const kw = engine.primary_keyword || engine.category || "Utility";
-                        const link = `/go/${id}`;
+                        const link = id.startsWith('sequence-engine') ? engine.launchUrl : `/go/${id}`;
                         const microcopy = ENGINE_MICROCOPY[id] || DEFAULT_MICROCOPY;
 
                         const isLive = engine.status === 'live';
@@ -195,8 +211,10 @@ export default function EnginesDir() {
                             const id = engine.id || engine.engine_id;
                             const name = engine.name || engine.engine_name;
                             const microcopy = ENGINE_MICROCOPY[id] || DEFAULT_MICROCOPY;
+                            const link = id.startsWith('sequence-engine') ? engine.launchUrl : `/go/${id}`;
+
                             return (
-                                <Link key={id} href={`/go/${id}`} className="group block bg-white border border-gray-200 rounded-lg p-5 hover:border-blue-500 hover:ring-1 hover:ring-blue-500 transition flex flex-col h-full">
+                                <Link key={id} href={link} className="group block bg-white border border-gray-200 rounded-lg p-5 hover:border-blue-500 hover:ring-1 hover:ring-blue-500 transition flex flex-col h-full">
                                     <h3 className="font-bold text-gray-900 group-hover:text-blue-700">{name}</h3>
                                     <p className="text-sm text-gray-500 mt-1 line-clamp-2 flex-grow">{engine.shortDescription || engine.seo?.description}</p>
 
