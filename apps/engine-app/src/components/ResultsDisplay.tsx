@@ -270,7 +270,6 @@ export function ResultsDisplay({ run }: ResultsProps) {
                             </div>
                         )}
                     </div>
-                        )}
 
                     {/* ------------------------------------------------------------------ */}
                     {/* 4. NEW PATH ENGINE RESULTS DISPLAY */}
@@ -386,9 +385,6 @@ export function ResultsDisplay({ run }: ResultsProps) {
                                                     </div>
                                                 </div>
                                             )}
-
-                                            {/* Result Meta / Debug */}
-                                            {/* <pre className="text-xs text-slate-300 mt-4">{JSON.stringify(result.meta, null, 2)}</pre> */}
                                         </div>
                                     </div>
                                 ))}
@@ -419,6 +415,5 @@ export function ResultsDisplay({ run }: ResultsProps) {
                 </div>
             )}
         </div>
-        </div >
     );
 }
