@@ -40,7 +40,6 @@ export class AffiliateLeadPath implements PathEngine {
             monetization: {
                 offers: [],
                 value: enrichedLeads.length * 2.00, // $2 per lead
-                description: "Potential value of scraped leads.",
                 currency: "USD",
                 type: "lead"
             },
