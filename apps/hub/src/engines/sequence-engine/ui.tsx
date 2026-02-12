@@ -45,7 +45,7 @@ export default function SequenceEngineUI() {
         setLoading(true);
         setError('');
         try {
-            const res = await fetch('/api/engines/sequence-engine/generate', {
+            const res = await fetch('/api/engines/sequence-engine/run', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)
