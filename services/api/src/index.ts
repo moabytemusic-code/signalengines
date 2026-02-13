@@ -305,6 +305,37 @@ app.get("/me", (req: AuthRequest, res) => {
     res.json(req.user);
 });
 
+app.post("/auth/create-session", async (req, res) => {
+    const { userId } = req.body;
+
+    if (!userId) {
+        res.status(400).json({ error: "userId required" });
+        return;
+    }
+
+    // Verify user exists
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+        res.status(404).json({ error: "User not found" });
+        return;
+    }
+
+    // Create session
+    const token = Math.random().toString(36).substring(2) + Date.now().toString(36);
+    const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
+
+    await prisma.session.create({
+        data: {
+            userId,
+            token,
+            expiresAt
+        }
+    });
+
+    res.json({ sessionToken: token });
+});
+
+
 app.post("/engines/:id/run", async (req: AuthRequest, res) => {
     const engineId = req.params.id as string;
     const { inputs } = req.body;
