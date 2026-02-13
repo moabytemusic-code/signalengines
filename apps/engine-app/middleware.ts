@@ -18,8 +18,11 @@ export default async function middleware(req: NextRequest) {
     const url = req.nextUrl;
     const hostname = req.headers.get("host") || "";
 
-    // Get Engine ID
-    const engineId = getEngineIdFromHost(hostname);
+    // Check for engine query parameter first (e.g., ?engine=accountrecovery)
+    const engineQueryParam = url.searchParams.get("engine");
+
+    // Get Engine ID from query param or hostname
+    const engineId = engineQueryParam || getEngineIdFromHost(hostname);
 
     if (!engineId && url.pathname !== '/engine-not-found') {
         url.pathname = `/engine-not-found`;
