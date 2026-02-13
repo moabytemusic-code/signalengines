@@ -2,27 +2,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { gumroadProvider } from '../../../../billing/gumroad';
 import { prisma } from '../../../../lib/db';
+import { sendWelcomeEmail, sendUpgradeEmail } from '../../../../lib/brevo';
 
-async function sendWelcomeEmail(email: string, autoLoginUrl: string) {
-    // TODO: Implement email sending (using Resend, SendGrid, etc.)
-    // For now, just log it
-    console.log(`[WELCOME EMAIL] To: ${email}`);
-    console.log(`[AUTO-LOGIN LINK] ${autoLoginUrl}`);
 
-    // Example with Resend (if you have it configured):
-    /*
-    await resend.emails.send({
-        from: 'Signal Engines <noreply@signalengines.com>',
-        to: email,
-        subject: 'Welcome to Signal Engines - Your Access is Ready!',
-        html: `
-            <h1>Welcome to Signal Engines!</h1>
-            <p>Thanks for your purchase. Your pro access is now active.</p>
-            <p><a href="${autoLoginUrl}">Click here to access your Sequence Generator</a></p>
-        `
-    });
-    */
-}
 
 export async function POST(req: NextRequest) {
     try {
@@ -56,6 +38,9 @@ export async function POST(req: NextRequest) {
         });
 
         if (user) {
+            // Check if this is an upgrade
+            const isUpgrade = user.tier === 'free' && (entitlement.tier === 'pro' || entitlement.tier === 'agency');
+
             // Update existing user
             await prisma.user.update({
                 where: { email: entitlement.userEmail },
@@ -65,6 +50,12 @@ export async function POST(req: NextRequest) {
                     billingSubscriptionId: entitlement.externalSubId
                 }
             });
+
+            // Send upgrade email if tier changed
+            if (isUpgrade) {
+                await sendUpgradeEmail(entitlement.userEmail, entitlement.tier);
+            }
+
             console.log(`Updated user ${user.id} tier to ${entitlement.tier}`);
         } else {
             // Create new user with auto-login token

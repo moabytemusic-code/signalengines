@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { PrismaClient } from '@prisma/client';
 import { apiClient } from '@/lib/api';
+import { sendLimitReachedEmail } from '@/lib/brevo';
 
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY
@@ -68,6 +69,11 @@ export async function POST(request: Request) {
         const isPaid = user.tier === 'pro' || user.tier === 'agency';
 
         if (!isPaid && counter.count >= FREE_DAILY_LIMIT) {
+            // Send limit reached email
+            await sendLimitReachedEmail(user.email, 'Cold Email Sequence Generator').catch(err => {
+                console.error('Failed to send limit email:', err);
+            });
+
             return NextResponse.json(
                 {
                     error: `Free tier limit reached (${FREE_DAILY_LIMIT}/day). Upgrade for unlimited access.`,
