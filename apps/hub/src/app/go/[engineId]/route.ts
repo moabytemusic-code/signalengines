@@ -1,11 +1,5 @@
 import { NextResponse } from 'next/server';
 
-const SUBDOMAIN_MAP: Record<string, string> = {
-    "emailwarmup": "warmup",
-    "tiktok-idea-batch": "ideas",
-    "tiktok-script-generator": "scripts"
-};
-
 export async function GET(request: Request, { params }: { params: Promise<{ engineId: string }> }) {
     const { engineId } = await params;
 
@@ -13,8 +7,6 @@ export async function GET(request: Request, { params }: { params: Promise<{ engi
         return NextResponse.redirect(new URL('/engines', request.url));
     }
 
-    const subdomain = SUBDOMAIN_MAP[engineId] || engineId;
-
-    // Redirect to the Tool Subdomain
-    return NextResponse.redirect(`https://${subdomain}.signalengines.com`);
+    // Redirect to ideas.signalengines.com with engine query parameter
+    return NextResponse.redirect(`https://ideas.signalengines.com?engine=${engineId}`);
 }
