@@ -23,7 +23,7 @@ export async function addOrUpdateContact(email: string, tier: string = 'free') {
             TIER: tier.toUpperCase(),
             SIGNUP_DATE: new Date().toISOString()
         };
-        createContact.listIds = [2]; // Main SignalEngines list (you'll need to create this in Brevo)
+        createContact.listIds = [63]; // SignalEngines Users list
         createContact.updateEnabled = true; // Update if contact already exists
 
         await contactsApi.createContact(createContact);
