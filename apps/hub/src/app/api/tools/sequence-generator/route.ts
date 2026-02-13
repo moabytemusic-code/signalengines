@@ -1,12 +1,88 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { PrismaClient } from '@prisma/client';
+import { apiClient } from '@/lib/api';
 
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY
 });
 
+const prisma = new PrismaClient();
+
+const ENGINE_ID = 'sequence-generator';
+const FREE_DAILY_LIMIT = 3;
+
+async function getOrCreateUsageCounter(userId: string) {
+    const now = new Date();
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const endOfDay = new Date(startOfDay);
+    endOfDay.setDate(endOfDay.getDate() + 1);
+
+    let counter = await prisma.usageCounter.findUnique({
+        where: {
+            userId_engineId: {
+                userId,
+                engineId: ENGINE_ID
+            }
+        }
+    });
+
+    // Reset counter if it's a new day
+    if (counter && counter.periodEnd < now) {
+        counter = await prisma.usageCounter.update({
+            where: { id: counter.id },
+            data: {
+                count: 0,
+                periodStart: startOfDay,
+                periodEnd: endOfDay
+            }
+        });
+    }
+
+    // Create counter if it doesn't exist
+    if (!counter) {
+        counter = await prisma.usageCounter.create({
+            data: {
+                userId,
+                engineId: ENGINE_ID,
+                periodStart: startOfDay,
+                periodEnd: endOfDay,
+                count: 0
+            }
+        });
+    }
+
+    return counter;
+}
+
 export async function POST(request: Request) {
     try {
+        // Get user from session
+        const user = await apiClient('/me').then(res => res.json()).catch(() => null);
+
+        if (!user) {
+            return NextResponse.json(
+                { error: 'Authentication required', requiresAuth: true },
+                { status: 401 }
+            );
+        }
+
+        // Check usage limits
+        const counter = await getOrCreateUsageCounter(user.id);
+        const isPaid = user.tier === 'pro' || user.tier === 'agency';
+
+        if (!isPaid && counter.count >= FREE_DAILY_LIMIT) {
+            return NextResponse.json(
+                {
+                    error: `Free tier limit reached (${FREE_DAILY_LIMIT}/day). Upgrade for unlimited access.`,
+                    limitReached: true,
+                    usageCount: counter.count,
+                    limit: FREE_DAILY_LIMIT
+                },
+                { status: 429 }
+            );
+        }
+
         const { topic, platform, tone, count } = await request.json();
 
         if (!topic) {
@@ -69,13 +145,35 @@ Return as JSON array with this structure:
 
         const sequence = JSON.parse(cleanedResponse);
 
+        // Save to database
+        const savedSequence = await prisma.sequence.create({
+            data: {
+                userId: user.id,
+                engineId: ENGINE_ID,
+                inputs: { topic, platform, tone, count },
+                output: { sequence }
+            }
+        });
+
+        // Increment usage counter
+        await prisma.usageCounter.update({
+            where: { id: counter.id },
+            data: { count: counter.count + 1 }
+        });
+
         return NextResponse.json({
+            id: savedSequence.id,
             sequence,
             metadata: {
                 topic,
                 platform,
                 tone,
                 count
+            },
+            usage: {
+                count: counter.count + 1,
+                limit: isPaid ? 'unlimited' : FREE_DAILY_LIMIT,
+                remaining: isPaid ? 'unlimited' : FREE_DAILY_LIMIT - (counter.count + 1)
             }
         });
 
@@ -85,5 +183,7 @@ Return as JSON array with this structure:
             { error: error.message || 'Failed to generate sequence' },
             { status: 500 }
         );
+    } finally {
+        await prisma.$disconnect();
     }
 }
