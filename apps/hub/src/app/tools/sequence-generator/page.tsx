@@ -358,6 +358,20 @@ export default function SequenceGeneratorPage() {
                     </div>
                 </div>
             </section>
+
+            {/* Support Footer */}
+            <section className="py-12 px-4 bg-blue-600 text-white">
+                <div className="max-w-3xl mx-auto text-center">
+                    <h3 className="text-xl font-bold mb-4">Need Help?</h3>
+                    <p className="mb-2">
+                        <strong>Support:</strong>{' '}
+                        <a href="mailto:support@signalengines.com" className="underline hover:text-blue-200 transition-colors">
+                            support@signalengines.com
+                        </a>
+                    </p>
+                    <p className="text-blue-200">Response time: 24–48 hours</p>
+                </div>
+            </section>
         </div>
     );
 }

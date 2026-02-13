@@ -303,6 +303,20 @@ export default function EmailSequenceGeneratorPage() {
                     </div>
                 </div>
             </section>
+
+            {/* Support Footer */}
+            <section className="py-12 px-4 bg-indigo-600 text-white">
+                <div className="max-w-3xl mx-auto text-center">
+                    <h3 className="text-xl font-bold mb-4">Need Help?</h3>
+                    <p className="mb-2">
+                        <strong>Support:</strong>{' '}
+                        <a href="mailto:support@signalengines.com" className="underline hover:text-indigo-200 transition-colors">
+                            support@signalengines.com
+                        </a>
+                    </p>
+                    <p className="text-indigo-200">Response time: 24–48 hours</p>
+                </div>
+            </section>
         </div>
     );
 }
