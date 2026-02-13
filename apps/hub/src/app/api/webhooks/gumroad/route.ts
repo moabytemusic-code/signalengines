@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { gumroadProvider } from '../../../../billing/gumroad';
 import { prisma } from '../../../../lib/db';
-import { sendWelcomeEmail, sendUpgradeEmail } from '../../../../lib/brevo';
+import { sendWelcomeEmail, sendUpgradeEmail, addOrUpdateContact, updateContactTier } from '../../../../lib/brevo';
 
 
 
@@ -54,6 +54,10 @@ export async function POST(req: NextRequest) {
             // Send upgrade email if tier changed
             if (isUpgrade) {
                 await sendUpgradeEmail(entitlement.userEmail, entitlement.tier);
+                // Update contact tier in Brevo
+                await updateContactTier(entitlement.userEmail, entitlement.tier).catch(err => {
+                    console.error('Failed to update Brevo contact:', err);
+                });
             }
 
             console.log(`Updated user ${user.id} tier to ${entitlement.tier}`);
@@ -79,6 +83,11 @@ export async function POST(req: NextRequest) {
 
             // Send welcome email
             await sendWelcomeEmail(entitlement.userEmail, autoLoginUrl);
+
+            // Add to Brevo contact list
+            await addOrUpdateContact(entitlement.userEmail, entitlement.tier).catch(err => {
+                console.error('Failed to add Brevo contact:', err);
+            });
 
             console.log(`Created new user ${user.id} with tier ${entitlement.tier}`);
             console.log(`Auto-login URL: ${autoLoginUrl}`);

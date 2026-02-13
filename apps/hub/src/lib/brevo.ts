@@ -3,8 +3,59 @@ import * as brevo from '@getbrevo/brevo';
 const apiInstance = new brevo.TransactionalEmailsApi();
 apiInstance.setApiKey(brevo.TransactionalEmailsApiApiKeys.apiKey, process.env.BREVO_API_KEY || '');
 
+const contactsApi = new brevo.ContactsApi();
+contactsApi.setApiKey(brevo.ContactsApiApiKeys.apiKey, process.env.BREVO_API_KEY || '');
+
 const SENDER_EMAIL = 'support@signalengines.com';
 const SENDER_NAME = 'SignalEngines Support';
+
+// Contact List Management
+export async function addOrUpdateContact(email: string, tier: string = 'free') {
+    if (!process.env.BREVO_API_KEY) {
+        console.warn('[BREVO] API key not configured, skipping contact sync');
+        return;
+    }
+
+    try {
+        const createContact = new brevo.CreateContact();
+        createContact.email = email;
+        createContact.attributes = {
+            TIER: tier.toUpperCase(),
+            SIGNUP_DATE: new Date().toISOString()
+        };
+        createContact.listIds = [2]; // Main SignalEngines list (you'll need to create this in Brevo)
+        createContact.updateEnabled = true; // Update if contact already exists
+
+        await contactsApi.createContact(createContact);
+        console.log(`[BREVO] Contact added/updated: ${email} (${tier})`);
+    } catch (error: any) {
+        // Ignore duplicate contact errors
+        if (error.response?.body?.code !== 'duplicate_parameter') {
+            console.error('[BREVO] Error adding contact:', error);
+        }
+    }
+}
+
+export async function updateContactTier(email: string, tier: string) {
+    if (!process.env.BREVO_API_KEY) {
+        console.warn('[BREVO] API key not configured, skipping contact update');
+        return;
+    }
+
+    try {
+        const updateContact = new brevo.UpdateContact();
+        updateContact.attributes = {
+            TIER: tier.toUpperCase(),
+            LAST_UPGRADE: new Date().toISOString()
+        };
+
+        await contactsApi.updateContact(email, updateContact);
+        console.log(`[BREVO] Contact tier updated: ${email} -> ${tier}`);
+    } catch (error) {
+        console.error('[BREVO] Error updating contact:', error);
+    }
+}
+
 
 interface SendEmailParams {
     to: string;
