@@ -1,10 +1,8 @@
 
 import { EngineModule } from './types';
-// Importing sequence-engine module implementation
-import { sequenceEngineModule } from './sequence-engine/module';
 
 export const engineRegistry: EngineModule[] = [
-    sequenceEngineModule,
+    // No engines registered yet
 ];
 
 export function getEngine(id: string): EngineModule | undefined {
