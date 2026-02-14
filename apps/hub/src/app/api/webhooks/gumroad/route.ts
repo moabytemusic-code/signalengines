@@ -9,18 +9,21 @@ import { sendWelcomeEmail, sendUpgradeEmail, addOrUpdateContact, updateContactTi
 export async function POST(req: NextRequest) {
     try {
         const contentType = req.headers.get('content-type') || '';
+        const rawBody = await req.text();
         let payload: any = {};
 
         if (contentType.includes('application/json')) {
-            payload = await req.json();
+            payload = JSON.parse(rawBody);
         } else if (contentType.includes('application/x-www-form-urlencoded')) {
-            const formData = await req.formData();
-            payload = Object.fromEntries(formData.entries());
+            const params = new URLSearchParams(rawBody);
+            payload = Object.fromEntries(params.entries());
         } else {
+            // Fallback or error on unsupported types for webhook
+            // Gumroad strictly sends x-www-form-urlencoded
             return NextResponse.json({ error: 'Unsupported Content-Type' }, { status: 400 });
         }
 
-        const event = await gumroadProvider.verifyWebhook(payload, req.headers);
+        const event = await gumroadProvider.verifyWebhook(payload, req.headers, rawBody);
 
         if (!event.isVerified) {
             return NextResponse.json({ error: 'Verification failed' }, { status: 403 });

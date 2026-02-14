@@ -8,6 +8,9 @@ import { getAllEngines } from '../../engines/registry';
 
 // 1. Local Registry (Legacy)
 const LEGACY_ENGINES = [
+    { id: "sequence-generator", name: "Content Engine", category: "Social & Content", shortDescription: "Generate viral content sequences for social media platforms.", status: "live", accessTier: "free", launchUrl: "/tools/sequence-generator" },
+    { id: "email-sequence-generator", name: "Email Engine", category: "Email Marketing", shortDescription: "Create high-converting cold email sequences in seconds.", status: "live", accessTier: "free", launchUrl: "/tools/email-sequence-generator" },
+
     { id: "emailwarmup", name: "Email Reputation Checker", category: "Deliverability", shortDescription: "Check for blacklists and low sender reputation scores.", status: "live", accessTier: "free", launchUrl: "https://warmup.signalengines.com" },
     { id: "tiktok-idea-batch", name: "TikTok Viral Idea Batch", category: "Growth", shortDescription: "Generate 10 viral video concepts tailored to your niche.", status: "live", accessTier: "free", launchUrl: "https://ideas.signalengines.com" },
     { id: "tiktok-script-generator", name: "TikTok Script Generator", category: "Growth", shortDescription: "Turn any idea into a viral script in seconds (Hook, Body, CTA).", status: "live", accessTier: "free", launchUrl: "https://scripts.signalengines.com" },

@@ -19,6 +19,7 @@
     "seed": "ts-node prisma/seed.ts"
   },
   "dependencies": {
+    "@getbrevo/brevo": "^3.0.1",
     "@prisma/client": "^5.22.0",
     "@signalengines/engine-config": "*",
     "cookie-parser": "^1.4.7",

@@ -1,5 +1,6 @@
 import { prisma } from "./lib/db";
 import { EngineConfig, PathRegistry, PathContext, PathResult } from "@signalengines/engine-config";
+import { addOrUpdateContact } from "./lib/brevo";
 
 // Helper to check daily limit
 export async function checkRateLimit(engineId: string, userId?: string, anonymousId?: string) {
@@ -103,7 +104,6 @@ const ENGINES_SIMULATION: Record<string, any> = {
             ]
         }
     },
-    // ... (Keep other simple engines same, they will fallback to DEFAULT_PAID_CONTENT if accessed)
     "tiktok-idea-batch": {
         risk: 10,
         causes: ["Consistent Posting Schedule", "High Engagement Hook", "Trending Audio"],
@@ -115,10 +115,18 @@ const ENGINES_SIMULATION: Record<string, any> = {
             "Concept 5: Storytime - Tell a customer success or failure story."
         ]
     },
-    // ... keep rest ...
+    "tiktok-script-generator": {
+        risk: 20,
+        causes: ["Viral Structure", "Pattern Interrupt", "Call to Action"],
+        steps: [
+            "Hook: Stop scrolling immediately.",
+            "Act 1: Identify the problem.",
+            "Act 2: Agitate the pain.",
+            "Resolution: Present your solution.",
+            "CTA: Tell them exactly what to do next."
+        ]
+    }
 };
-
-// ... (existing code for other engines omitted for brevity in replacement, assume valid JS merge)
 
 export async function executeEngineRun(
     engine: EngineConfig,
@@ -127,6 +135,22 @@ export async function executeEngineRun(
     anonymousId?: string
 ) {
     const userId = user?.id ? (user.id as string) : undefined;
+
+    // 0. Email Capture (Brevo) via Inputs
+    // We check if the user provided an email in the inputs (e.g. for a report)
+    // and sync it to Brevo. This ensures "all other engines" capture leads.
+    if (inputs?.email && typeof inputs.email === 'string') {
+        // If logged in, use their real tier. If anonymous, assume 'free'.
+        // Note: This matches the verification flow tier logic.
+        const tier = user?.tier || 'free';
+
+        // Await to ensure Vercel doesn't kill the process
+        try {
+            await addOrUpdateContact(inputs.email, tier);
+        } catch (err: any) {
+            console.error(`[Brevo] Failed to sync contact from engine run (${engine.engine_id}):`, err.message);
+        }
+    }
 
     // 1. Rate Limit
     const allowed = await checkRateLimit(engine.engine_id, userId, anonymousId);

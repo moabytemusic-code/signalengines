@@ -56,7 +56,12 @@ async function getOrCreateUsageCounter(userId: string) {
 
 export async function POST(request: Request) {
     try {
-        const user = await apiClient('/me').then(res => res.json()).catch(() => null);
+        // Get user from session (forward cookies)
+        const user = await apiClient('/me', {
+            headers: {
+                cookie: request.headers.get('cookie') || ''
+            }
+        }).then(res => res.json()).catch(() => null);
 
         if (!user) {
             return NextResponse.json(

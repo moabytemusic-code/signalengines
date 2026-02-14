@@ -12,6 +12,7 @@ import {
 } from "./auth";
 import { executeEngineRun, getRun } from "./engineRuns";
 import { prisma } from "./lib/db";
+import { addOrUpdateContact } from "./lib/brevo";
 
 dotenv.config();
 
@@ -289,6 +290,12 @@ app.get("/auth/verify", async (req, res) => {
     let user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
         user = await prisma.user.create({ data: { email } });
+        // Add to Brevo
+        try {
+            await addOrUpdateContact(email, "free");
+        } catch (err) {
+            console.error('[Brevo] Sync failed on signup:', err);
+        }
     }
 
     await createSession(user.id, res);
