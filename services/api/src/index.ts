@@ -8,6 +8,7 @@ import {
     generateMagicLinkToken,
     verifyMagicLinkToken,
     createSession,
+    createSessionToken,
     AuthRequest
 } from "./auth";
 import { executeEngineRun, getRun } from "./engineRuns";
