@@ -81,7 +81,7 @@ export default function AccountPage() {
                 <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
                     {magicSent ? (
                         <div className="bg-green-50 text-green-800 p-4 rounded-lg text-center">
-                            Check your email for the login link!
+                            Check your email (and spam).
                         </div>
                     ) : (
                         <form className="space-y-6" onSubmit={handleLogin}>

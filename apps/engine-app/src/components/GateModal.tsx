@@ -39,8 +39,6 @@ export function GateModal({ engineId }: { engineId: string }) {
                         <Check className="mr-2" size={20} />
                         <div>
                             <span className="font-bold">Link Sent!</span> Check your email (and spam).
-                            <br />
-                            <span className="text-xs text-slate-500 mt-2 block">(In Dev: Check Terminal)</span>
                         </div>
                     </div>
                 ) : (
