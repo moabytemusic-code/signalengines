@@ -67,7 +67,7 @@ export async function createSession(userId: string, res: Response) {
         httpOnly: true,
         secure: isProd,
         sameSite: isProd ? "none" : "lax",
-        domain: process.env.COOKIE_DOMAIN || (isProd ? ".signalengines.com" : undefined),
+        domain: process.env.COOKIE_DOMAIN, // Allow fallback to HostOnly if unset
         expires: expiresAt
     });
 }
