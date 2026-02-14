@@ -15,6 +15,28 @@ export default function AccountPage() {
     const [entitlements, setEntitlements] = useState<any>(null);
 
     useEffect(() => {
+        // Handle Session Token Handoff (Fix for Cross-Domain Cookie Issues)
+        const params = new URLSearchParams(window.location.search);
+        const token = params.get('session_token');
+        if (token) {
+            console.log("Detected session_token, setting cookie...");
+            // Set cookie for root domain if possible, or current host
+            const isProd = window.location.hostname !== 'localhost';
+            const domain = isProd ? `domain=.signalengines.com;` : '';
+            const secure = isProd ? 'secure;' : '';
+
+            document.cookie = `signal_session=${token}; path=/; ${domain} ${secure} max-age=2592000; samesite=${isProd ? 'none' : 'lax'}`;
+
+            // Clean URL
+            window.history.replaceState({}, '', window.location.pathname);
+
+            // Reload to pick up cookie? Or just let useAuth fetch /me
+            // useAuth likely runs on mount. We might need to trigger re-fetch.
+            window.location.reload();
+        }
+    }, []);
+
+    useEffect(() => {
         if (user) {
             apiClient("/account/runs").then(setRuns).catch(console.error);
             apiClient("/account/entitlements").then(setEntitlements).catch(console.error);

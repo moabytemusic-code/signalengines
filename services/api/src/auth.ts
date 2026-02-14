@@ -49,7 +49,7 @@ export const authMiddleware = async (req: AuthRequest, res: Response, next: Next
     next();
 };
 
-export async function createSession(userId: string, res: Response) {
+export async function createSessionToken(userId: string): Promise<string> {
     const token = Math.random().toString(36).substring(2) + Date.now().toString(36);
     const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
 
@@ -61,13 +61,19 @@ export async function createSession(userId: string, res: Response) {
         }
     });
 
-    // Set Cookie
+    return token;
+}
+
+export async function createSession(userId: string, res: Response) {
+    const token = await createSessionToken(userId);
+    const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
+
     const isProd = process.env.NODE_ENV === "production";
     res.cookie(SESSION_COOKIE, token, {
         httpOnly: true,
         secure: isProd,
         sameSite: isProd ? "none" : "lax",
-        domain: process.env.COOKIE_DOMAIN, // Allow fallback to HostOnly if unset
+        domain: process.env.COOKIE_DOMAIN,
         expires: expiresAt
     });
 }

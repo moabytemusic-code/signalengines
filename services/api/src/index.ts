@@ -298,10 +298,33 @@ app.get("/auth/verify", async (req, res) => {
         }
     }
 
-    await createSession(user.id, res);
+    await createSession(user.id, res); // Try setting cookie (legacy/same-domain support)
+
+    // Also generate clean token for manual handoff (cross-domain fix)
+    // We can reuse the token from createSession if we refactor, but generating a new session is fine.
+    // Actually, createSession generates a token. We should capture it.
+    // Refactor: let's just use createSessionToken and set cookie manually here to be safe and avoid double-create.
+
+    const tokenStr = await createSessionToken(user.id);
+    const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+    const isProd = process.env.NODE_ENV === "production";
+
+    res.cookie("signal_session", tokenStr, {
+        httpOnly: true,
+        secure: isProd,
+        sameSite: isProd ? "none" : "lax",
+        domain: process.env.COOKIE_DOMAIN,
+        expires: expiresAt
+    });
 
     const hubUrl = process.env.HUB_URL || "http://localhost:3006";
-    res.redirect((return_to as string) || hubUrl);
+    const target = (return_to as string) || hubUrl;
+
+    // Append session_token to redirect target
+    const redirectUrl = new URL(target);
+    redirectUrl.searchParams.set("session_token", tokenStr);
+
+    res.redirect(redirectUrl.toString());
 });
 
 app.get("/me", (req: AuthRequest, res) => {
