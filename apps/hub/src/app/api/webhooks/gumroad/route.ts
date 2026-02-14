@@ -35,65 +35,82 @@ export async function POST(req: NextRequest) {
 
         const entitlement = await gumroadProvider.getUserEntitlement(event);
 
-        // Find or create user
+        // 1. Ensure User Exists
         let user = await prisma.user.findUnique({
             where: { email: entitlement.userEmail }
         });
 
-        if (user) {
-            // Check if this is an upgrade
-            const isUpgrade = user.tier === 'free' && (entitlement.tier === 'pro' || entitlement.tier === 'agency');
+        let isNewUser = false;
+        let autoLoginUrl = '';
 
-            // Update existing user
-            await prisma.user.update({
-                where: { email: entitlement.userEmail },
-                data: {
-                    tier: entitlement.tier,
-                    billingProvider: 'gumroad',
-                    billingSubscriptionId: entitlement.externalSubId
-                }
-            });
-
-            // Send upgrade email if tier changed
-            if (isUpgrade) {
-                await sendUpgradeEmail(entitlement.userEmail, entitlement.tier);
-                // Update contact tier in Brevo
-                await updateContactTier(entitlement.userEmail, entitlement.tier).catch(err => {
-                    console.error('Failed to update Brevo contact:', err);
-                });
-            }
-
-            console.log(`Updated user ${user.id} tier to ${entitlement.tier}`);
-        } else {
-            // Create new user with auto-login token
+        if (!user) {
+            isNewUser = true;
+            // Create new user
             const autoLoginToken = Math.random().toString(36).substring(2) + Date.now().toString(36);
             const tokenExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
 
             user = await prisma.user.create({
                 data: {
                     email: entitlement.userEmail,
-                    tier: entitlement.tier,
+                    tier: 'free', // Default, entitlements determine access
                     billingProvider: 'gumroad',
-                    billingSubscriptionId: entitlement.externalSubId,
                     magicLinkToken: autoLoginToken,
                     tokenExpiresAt
                 }
             });
 
-            // Generate auto-login URL
             const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.signalengines.com';
-            const autoLoginUrl = `${baseUrl}/api/auth/auto-login?token=${autoLoginToken}&redirect=/tools/sequence-generator`;
+            autoLoginUrl = `${baseUrl}/api/auth/auto-login?token=${autoLoginToken}&redirect=/tools/sequence-generator`;
+        }
 
-            // Send welcome email
-            await sendWelcomeEmail(entitlement.userEmail, autoLoginUrl);
+        // 2. Grant Entitlement
+        if (entitlement.engineId) {
+            const hasAccess = entitlement.tier === 'pro' || entitlement.tier === 'agency';
 
-            // Add to Brevo contact list
-            await addOrUpdateContact(entitlement.userEmail, entitlement.tier).catch(err => {
-                console.error('Failed to add Brevo contact:', err);
+            console.log(`Granting access to engine ${entitlement.engineId} for user ${user.id} (${hasAccess})`);
+
+            await prisma.engineEntitlement.upsert({
+                where: {
+                    userId_engineId: {
+                        userId: user.id,
+                        engineId: entitlement.engineId
+                    }
+                },
+                update: { hasAccess },
+                create: {
+                    userId: user.id,
+                    engineId: entitlement.engineId,
+                    hasAccess
+                }
             });
 
-            console.log(`Created new user ${user.id} with tier ${entitlement.tier}`);
-            console.log(`Auto-login URL: ${autoLoginUrl}`);
+            // Update Global Tier if gaining access
+            if (hasAccess && user.tier === 'free') {
+                await prisma.user.update({
+                    where: { id: user.id },
+                    data: { tier: 'pro' }
+                });
+
+                // Brevo Sync
+                await updateContactTier(user.email, 'pro').catch(console.error);
+                if (!isNewUser) {
+                    await sendUpgradeEmail(user.email, 'Pro Tool Access');
+                }
+            }
+        } else {
+            // Fallback: Global Tier Update (Unmapped Product)
+            if (entitlement.tier === 'pro' || entitlement.tier === 'agency') {
+                await prisma.user.update({
+                    where: { id: user.id },
+                    data: { tier: entitlement.tier }
+                });
+            }
+        }
+
+        // 3. New User Onboarding
+        if (isNewUser) {
+            await sendWelcomeEmail(entitlement.userEmail, autoLoginUrl);
+            await addOrUpdateContact(entitlement.userEmail, 'free').catch(console.error);
         }
 
         return NextResponse.json({ success: true });

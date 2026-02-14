@@ -58,133 +58,165 @@ async function getOrCreateUsageCounter(userId: string) {
 
 export async function POST(request: Request) {
     try {
-        // Get user from session
-        // Get user from session (forward cookies)
-        const user = await apiClient('/me', {
-            headers: {
-                cookie: request.headers.get('cookie') || ''
-            }
-        }).then(res => res.json()).catch(() => null);
+        const body = await request.json();
+        const { topic, platform, tone, count } = body;
 
-        if (!user) {
-            return NextResponse.json(
-                { error: 'Authentication required', requiresAuth: true },
-                { status: 401 }
-            );
+        // 1. Try to authenticate user
+        let user = null;
+        try {
+            const authResponse = await apiClient('/me', {
+                headers: {
+                    cookie: request.headers.get('cookie') || ''
+                }
+            });
+            if (authResponse.ok) {
+                user = await authResponse.json();
+            }
+        } catch (e) {
+            // Ignore auth error, treat as anonymous
         }
 
-        // Check usage limits
-        const counter = await getOrCreateUsageCounter(user.id);
-        const isPaid = user.tier === 'pro' || user.tier === 'agency';
+        const anonymousId = request.headers.get('x-anonymous-id');
+        let isAllowed = false;
+        let usageInfo = { count: 0, limit: FREE_DAILY_LIMIT, remaining: 0, isUnlimited: false };
+        let counter = null; // For logged in user
 
-        if (!isPaid && counter.count >= FREE_DAILY_LIMIT) {
-            // Send limit reached email
-            await sendLimitReachedEmail(user.email, 'Social Media Content Sequence Generator').catch(err => {
-                console.error('Failed to send limit email:', err);
+        // 2. Check Permissions
+        if (user) {
+            // Check specific engine entitlement
+            const entitlement = await prisma.engineEntitlement.findUnique({
+                where: { userId_engineId: { userId: user.id, engineId: ENGINE_ID } }
+            });
+            const isPaid = entitlement?.hasAccess || user.tier === 'agency';
+
+            usageInfo.isUnlimited = isPaid;
+
+            counter = await getOrCreateUsageCounter(user.id);
+            usageInfo.count = counter.count;
+            usageInfo.remaining = isPaid ? 999 : (FREE_DAILY_LIMIT - counter.count);
+
+            if (isPaid || counter.count < FREE_DAILY_LIMIT) {
+                isAllowed = true;
+            } else {
+                // Limit reached for free user
+                await sendLimitReachedEmail(user.email, 'Social Media Content Sequence Generator').catch(err => console.error(err));
+                return NextResponse.json(
+                    { error: `Free tier limit reached (${FREE_DAILY_LIMIT}/day). Upgrade for unlimited access.`, limitReached: true, ...usageInfo },
+                    { status: 429 }
+                );
+            }
+        } else if (anonymousId) {
+            // Check anonymous usage in EngineRun table (daily reset)
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const runs = await prisma.engineRun.count({
+                where: {
+                    engineId: ENGINE_ID,
+                    anonymousId: anonymousId,
+                    createdAt: { gte: today }
+                }
             });
 
-            return NextResponse.json(
-                {
-                    error: `Free tier limit reached (${FREE_DAILY_LIMIT}/day). Upgrade for unlimited access.`,
-                    limitReached: true,
-                    usageCount: counter.count,
-                    limit: FREE_DAILY_LIMIT
-                },
-                { status: 429 }
-            );
-        }
+            usageInfo.count = runs;
+            usageInfo.remaining = FREE_DAILY_LIMIT - runs;
 
-        const { topic, platform, tone, count } = await request.json();
+            if (runs < FREE_DAILY_LIMIT) {
+                isAllowed = true;
+            } else {
+                // Anonymous limit reached -> Prompt login
+                return NextResponse.json(
+                    { error: 'Free limit reached. Please sign in or upgrade.', requiresAuth: true },
+                    { status: 401 }
+                );
+            }
+        } else {
+            // No user and no anonymous ID? Should not happen if client is set up right
+            return NextResponse.json({ error: 'Authentication required', requiresAuth: true }, { status: 401 });
+        }
 
         if (!topic) {
-            return NextResponse.json(
-                { error: 'Topic is required' },
-                { status: 400 }
-            );
+            return NextResponse.json({ error: 'Topic is required' }, { status: 400 });
         }
 
+        // 3. Generate Content
         const prompt = `Generate a strategic content sequence of ${count} posts for ${platform} about "${topic}".
-
 Tone: ${tone}
 Platform: ${platform}
 
 For each post, provide:
-1. A compelling hook (first line that grabs attention)
-2. The hook type (question, stat, story, controversy, etc.)
+1. A compelling hook
+2. The hook type
 3. Main content (2-3 sentences)
 4. 3-5 relevant hashtags
 
-The sequence should:
-- Build on each other strategically
-- Mix different hook types
-- Progress from awareness → interest → engagement
-- Be optimized for ${platform} best practices
+The sequence should build strategically and be optimized for ${platform}.
 
-Return as JSON array with this structure:
-[
-  {
-    "hook": "string",
-    "hook_type": "string",
-    "content": "string",
-    "hashtags": ["string"]
-  }
-]`;
+Return as JSON array: [{ "hook": "...", "hook_type": "...", "content": "...", "hashtags": ["..."] }]`;
 
         const completion = await openai.chat.completions.create({
             model: 'gpt-4o-mini',
             messages: [
-                {
-                    role: 'system',
-                    content: 'You are a social media content strategist. Return only valid JSON, no markdown formatting.'
-                },
-                {
-                    role: 'user',
-                    content: prompt
-                }
+                { role: 'system', content: 'You are a social media strategist. Return only valid JSON.' },
+                { role: 'user', content: prompt }
             ],
-            temperature: 0.8,
-            max_tokens: 2000
+            temperature: 0.8
         });
 
         const responseText = completion.choices[0].message.content || '';
-
-        // Clean up response (remove markdown code blocks if present)
-        const cleanedResponse = responseText
-            .replace(/```json\n?/g, '')
-            .replace(/```\n?/g, '')
-            .trim();
-
+        const cleanedResponse = responseText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
         const sequence = JSON.parse(cleanedResponse);
 
-        // Save to database
-        const savedSequence = await prisma.sequence.create({
-            data: {
-                userId: user.id,
-                engineId: ENGINE_ID,
-                inputs: { topic, platform, tone, count },
-                output: { sequence }
-            }
-        });
+        // 4. Save Result
+        let savedId = '';
 
-        // Increment usage counter
-        await prisma.usageCounter.update({
-            where: { id: counter.id },
-            data: { count: counter.count + 1 }
-        });
+        if (user) {
+            // Save to Sequence table for user
+            const saved = await prisma.sequence.create({
+                data: {
+                    userId: user.id,
+                    engineId: ENGINE_ID,
+                    inputs: { topic, platform, tone, count },
+                    output: { sequence }
+                }
+            });
+            savedId = saved.id;
+
+            // Increment UsageCounter
+            if (counter) {
+                await prisma.usageCounter.update({
+                    where: { id: counter.id },
+                    data: { count: counter.count + 1 }
+                });
+            }
+        } else {
+            // Save to EngineRun table for anonymous
+            // EngineRun stores output via relation to EngineOutput
+            const saved = await prisma.engineRun.create({
+                data: {
+                    engineId: ENGINE_ID,
+                    anonymousId: anonymousId,
+                    inputs: JSON.stringify({ topic, platform, tone, count }),
+                    status: 'COMPLETED',
+                    output: {
+                        create: {
+                            freeOutput: JSON.stringify(sequence),
+                            paidOutput: null // No paid output for this tool
+                        }
+                    }
+                }
+            });
+            savedId = saved.id;
+        }
 
         return NextResponse.json({
-            id: savedSequence.id,
+            id: savedId,
             sequence,
-            metadata: {
-                topic,
-                platform,
-                tone,
-                count
-            },
+            metadata: { topic, platform, tone, count },
             usage: {
-                count: counter.count + 1,
-                limit: isPaid ? 'unlimited' : FREE_DAILY_LIMIT,
-                remaining: isPaid ? 'unlimited' : FREE_DAILY_LIMIT - (counter.count + 1)
+                count: usageInfo.count + 1,
+                limit: usageInfo.isUnlimited ? 'unlimited' : FREE_DAILY_LIMIT,
+                remaining: usageInfo.isUnlimited ? 'unlimited' : Math.max(0, usageInfo.remaining - 1)
             }
         });
 

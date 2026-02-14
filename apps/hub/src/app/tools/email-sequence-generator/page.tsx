@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { getAnonymousId } from '@/lib/api';
 
 export default function EmailSequenceGeneratorPage() {
     const router = useRouter();
@@ -25,7 +26,10 @@ export default function EmailSequenceGeneratorPage() {
         try {
             const res = await fetch('/api/tools/email-sequence-generator', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-anonymous-id': getAnonymousId()
+                },
                 credentials: 'include',
                 body: JSON.stringify(formData)
             });
@@ -137,7 +141,7 @@ export default function EmailSequenceGeneratorPage() {
                                     type="text"
                                     value={formData.niche}
                                     onChange={(e) => setFormData({ ...formData, niche: e.target.value })}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-slate-900 bg-white"
                                     placeholder="e.g., SaaS for real estate agents"
                                     required
                                 />
@@ -151,7 +155,7 @@ export default function EmailSequenceGeneratorPage() {
                                     type="text"
                                     value={formData.offer}
                                     onChange={(e) => setFormData({ ...formData, offer: e.target.value })}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-slate-900 bg-white"
                                     placeholder="e.g., Free 30-day trial of our CRM"
                                     required
                                 />
@@ -165,7 +169,7 @@ export default function EmailSequenceGeneratorPage() {
                                     type="text"
                                     value={formData.painPoint}
                                     onChange={(e) => setFormData({ ...formData, painPoint: e.target.value })}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-slate-900 bg-white"
                                     placeholder="e.g., Losing leads due to slow follow-up"
                                     required
                                 />
@@ -178,7 +182,7 @@ export default function EmailSequenceGeneratorPage() {
                                 <select
                                     value={formData.tone}
                                     onChange={(e) => setFormData({ ...formData, tone: e.target.value })}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-slate-900 bg-white"
                                 >
                                     <option value="professional">Professional</option>
                                     <option value="casual">Casual</option>
@@ -200,7 +204,7 @@ export default function EmailSequenceGeneratorPage() {
                             <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
                                 <p className="text-red-700 font-medium">{error}</p>
                                 {usage?.limitReached && (
-                                    <a href="/pricing" className="text-red-800 underline font-semibold mt-2 inline-block">
+                                    <a href={process.env.NEXT_PUBLIC_GUMROAD_LINK_EMAIL_SEQUENCE_GENERATOR || '/pricing'} className="text-red-800 underline font-semibold mt-2 inline-block">
                                         Upgrade to Pro for unlimited access →
                                     </a>
                                 )}

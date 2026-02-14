@@ -56,135 +56,169 @@ async function getOrCreateUsageCounter(userId: string) {
 
 export async function POST(request: Request) {
     try {
-        // Get user from session (forward cookies)
-        const user = await apiClient('/me', {
-            headers: {
-                cookie: request.headers.get('cookie') || ''
-            }
-        }).then(res => res.json()).catch(() => null);
+        const body = await request.json();
+        const { niche, offer, painPoint, tone } = body;
 
-        if (!user) {
-            return NextResponse.json(
-                { error: 'Authentication required', requiresAuth: true },
-                { status: 401 }
-            );
+        // 1. Try to authenticate user
+        let user = null;
+        try {
+            const authResponse = await apiClient('/me', {
+                headers: {
+                    cookie: request.headers.get('cookie') || ''
+                }
+            });
+            if (authResponse.ok) {
+                user = await authResponse.json();
+            }
+        } catch (e) {
+            // Ignore auth error
         }
 
-        const counter = await getOrCreateUsageCounter(user.id);
-        const isPaid = user.tier === 'pro' || user.tier === 'agency';
+        const anonymousId = request.headers.get('x-anonymous-id');
+        let isAllowed = false;
+        let usageInfo = { count: 0, limit: FREE_DAILY_LIMIT, remaining: 0, isUnlimited: false };
+        let counter = null;
 
-        if (!isPaid && counter.count >= FREE_DAILY_LIMIT) {
-            // Send limit reached email
-            await sendLimitReachedEmail(user.email, 'Cold Email Sequence Generator').catch(err => {
-                console.error('Failed to send limit email:', err);
+        let isPaid = false; // logic determines this below
+
+        // 2. Check Permissions
+        if (user) {
+            // Check specific engine entitlement
+            const entitlement = await prisma.engineEntitlement.findUnique({
+                where: { userId_engineId: { userId: user.id, engineId: ENGINE_ID } }
+            });
+            isPaid = entitlement?.hasAccess || user.tier === 'agency';
+
+            usageInfo.isUnlimited = isPaid;
+
+            counter = await getOrCreateUsageCounter(user.id);
+            usageInfo.count = counter.count;
+            usageInfo.remaining = isPaid ? 999 : (FREE_DAILY_LIMIT - counter.count);
+
+            if (isPaid || counter.count < FREE_DAILY_LIMIT) {
+                isAllowed = true;
+            } else {
+                await sendLimitReachedEmail(user.email, 'Cold Email Sequence Generator').catch(err => console.error(err));
+                return NextResponse.json(
+                    { error: `Free tier limit reached (${FREE_DAILY_LIMIT}/day). Upgrade for unlimited access.`, limitReached: true, ...usageInfo },
+                    { status: 429 }
+                );
+            }
+        } else if (anonymousId) {
+            // Anonymous Usage Logic
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const runs = await prisma.engineRun.count({
+                where: {
+                    engineId: ENGINE_ID,
+                    anonymousId: anonymousId,
+                    createdAt: { gte: today }
+                }
             });
 
-            return NextResponse.json(
-                {
-                    error: `Free tier limit reached (${FREE_DAILY_LIMIT}/day). Upgrade for unlimited access.`,
-                    limitReached: true,
-                    usageCount: counter.count,
-                    limit: FREE_DAILY_LIMIT
-                },
-                { status: 429 }
-            );
+            usageInfo.count = runs;
+            usageInfo.remaining = FREE_DAILY_LIMIT - runs;
+
+            if (runs < FREE_DAILY_LIMIT) {
+                isAllowed = true;
+            } else {
+                return NextResponse.json(
+                    { error: 'Free limit reached. Please sign in or upgrade.', requiresAuth: true },
+                    { status: 401 }
+                );
+            }
+        } else {
+            return NextResponse.json({ error: 'Authentication required', requiresAuth: true }, { status: 401 });
         }
 
-        const { niche, offer, painPoint, tone } = await request.json();
-
         if (!niche || !offer || !painPoint) {
-            return NextResponse.json(
-                { error: 'Niche, offer, and pain point are required' },
-                { status: 400 }
-            );
+            return NextResponse.json({ error: 'Niche, offer, and pain point are required' }, { status: 400 });
         }
 
         const emailCount = isPaid ? 7 : 3;
 
+        // 3. Generate Content
         const prompt = `Generate a ${emailCount}-email cold outreach sequence for the following:
-
 Niche: ${niche}
 Offer: ${offer}
 Pain Point: ${painPoint}
 Tone: ${tone}
 
 Create a persuasion architecture with these email types in order:
-1. Initial Outreach (pattern interrupt + value proposition)
-${emailCount >= 3 ? '2. Value Add (share insight, case study, or resource)' : ''}
-${emailCount >= 3 ? '3. Quick Bump (short, casual check-in)' : ''}
-${emailCount >= 5 ? '4. Social Proof (testimonial or results)' : ''}
-${emailCount >= 5 ? '5. Objection Handler (address common concerns)' : ''}
-${emailCount >= 7 ? '6. Last Chance (urgency/scarcity)' : ''}
-${emailCount >= 7 ? '7. Breakup Email (permission to close loop)' : ''}
+1. Initial Outreach
+${emailCount >= 3 ? '2. Value Add' : ''}
+${emailCount >= 3 ? '3. Quick Bump' : ''}
+${emailCount >= 5 ? '4. Social Proof' : ''}
+${emailCount >= 5 ? '5. Objection Handler' : ''}
+${emailCount >= 7 ? '6. Last Chance' : ''}
+${emailCount >= 7 ? '7. Breakup Email' : ''}
 
-For each email, provide:
-- type: (e.g., "Initial Outreach", "Value Add", "Quick Bump", "Breakup")
-- subject: A compelling subject line
-- body: The email body (2-4 short paragraphs, conversational)
-${isPaid ? '- personalization_tip: Specific advice on how to personalize this email for each prospect' : ''}
+For each email, provide: type, subject, body.
+${isPaid ? 'Include "personalization_tip" for each email.' : ''}
 
-Use the ${tone} tone throughout. Make it feel human, not robotic.
-
-Return as JSON array:
-[
-  {
-    "type": "string",
-    "subject": "string",
-    "body": "string"${isPaid ? ',\n    "personalization_tip": "string"' : ''}
-  }
-]`;
+Return as JSON array: [{ "type": "...", "subject": "...", "body": "..." }]`;
 
         const completion = await openai.chat.completions.create({
             model: 'gpt-4o-mini',
             messages: [
-                {
-                    role: 'system',
-                    content: 'You are an expert cold email copywriter. Return only valid JSON, no markdown formatting. Write emails that get replies, not spam complaints.'
-                },
-                {
-                    role: 'user',
-                    content: prompt
-                }
+                { role: 'system', content: 'You are an expert cold email copywriter. Return only valid JSON.' },
+                { role: 'user', content: prompt }
             ],
-            temperature: 0.7,
-            max_tokens: 3000
+            temperature: 0.7
         });
 
         const responseText = completion.choices[0].message.content || '';
-        const cleanedResponse = responseText
-            .replace(/```json\n?/g, '')
-            .replace(/```\n?/g, '')
-            .trim();
-
+        const cleanedResponse = responseText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
         const sequence = JSON.parse(cleanedResponse);
 
-        const savedSequence = await prisma.sequence.create({
-            data: {
-                userId: user.id,
-                engineId: ENGINE_ID,
-                inputs: { niche, offer, painPoint, tone },
-                output: { sequence }
-            }
-        });
+        // 4. Save Result
+        let savedId = '';
 
-        await prisma.usageCounter.update({
-            where: { id: counter.id },
-            data: { count: counter.count + 1 }
-        });
+        if (user) {
+            const saved = await prisma.sequence.create({
+                data: {
+                    userId: user.id,
+                    engineId: ENGINE_ID,
+                    inputs: { niche, offer, painPoint, tone },
+                    output: { sequence }
+                }
+            });
+            savedId = saved.id;
+
+            if (counter) {
+                await prisma.usageCounter.update({
+                    where: { id: counter.id },
+                    data: { count: counter.count + 1 }
+                });
+            }
+        } else {
+            // Save to EngineRun for anonymous
+            const saved = await prisma.engineRun.create({
+                data: {
+                    engineId: ENGINE_ID,
+                    anonymousId: anonymousId,
+                    inputs: JSON.stringify({ niche, offer, painPoint, tone }),
+                    status: 'COMPLETED',
+                    output: {
+                        create: {
+                            freeOutput: JSON.stringify(sequence),
+                            paidOutput: null
+                        }
+                    }
+                }
+            });
+            savedId = saved.id;
+        }
 
         return NextResponse.json({
-            id: savedSequence.id,
+            id: savedId,
             sequence,
-            metadata: {
-                niche,
-                offer,
-                painPoint,
-                tone
-            },
+            metadata: { niche, offer, painPoint, tone },
             usage: {
-                count: counter.count + 1,
-                limit: isPaid ? 'unlimited' : FREE_DAILY_LIMIT,
-                remaining: isPaid ? 'unlimited' : FREE_DAILY_LIMIT - (counter.count + 1)
+                count: usageInfo.count + 1,
+                limit: usageInfo.isUnlimited ? 'unlimited' : FREE_DAILY_LIMIT,
+                remaining: usageInfo.isUnlimited ? 'unlimited' : Math.max(0, usageInfo.remaining - 1)
             }
         });
 

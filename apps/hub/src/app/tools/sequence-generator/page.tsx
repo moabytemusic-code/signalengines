@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { getAnonymousId } from '@/lib/api';
 
 export default function SequenceGeneratorPage() {
     const router = useRouter();
@@ -25,7 +26,10 @@ export default function SequenceGeneratorPage() {
         try {
             const res = await fetch('/api/tools/sequence-generator', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-anonymous-id': getAnonymousId()
+                },
                 credentials: 'include',
                 body: JSON.stringify(formData)
             });
@@ -166,7 +170,7 @@ export default function SequenceGeneratorPage() {
                                     type="text"
                                     value={formData.topic}
                                     onChange={(e) => setFormData({ ...formData, topic: e.target.value })}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-slate-900 bg-white"
                                     placeholder="e.g., AI productivity tools"
                                     required
                                 />
@@ -179,7 +183,7 @@ export default function SequenceGeneratorPage() {
                                 <select
                                     value={formData.platform}
                                     onChange={(e) => setFormData({ ...formData, platform: e.target.value })}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-slate-900 bg-white"
                                 >
                                     <option value="tiktok">TikTok</option>
                                     <option value="instagram">Instagram</option>
@@ -195,7 +199,7 @@ export default function SequenceGeneratorPage() {
                                 <select
                                     value={formData.tone}
                                     onChange={(e) => setFormData({ ...formData, tone: e.target.value })}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-slate-900 bg-white"
                                 >
                                     <option value="educational">Educational</option>
                                     <option value="entertaining">Entertaining</option>
@@ -214,7 +218,7 @@ export default function SequenceGeneratorPage() {
                                     max="10"
                                     value={formData.count}
                                     onChange={(e) => setFormData({ ...formData, count: parseInt(e.target.value) })}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-slate-900 bg-white"
                                 />
                             </div>
 
@@ -231,7 +235,7 @@ export default function SequenceGeneratorPage() {
                             <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
                                 <p className="text-red-700 font-medium">{error}</p>
                                 {usage?.limitReached && (
-                                    <a href="/pricing" className="text-red-800 underline font-semibold mt-2 inline-block">
+                                    <a href={process.env.NEXT_PUBLIC_GUMROAD_LINK_SEQUENCE_GENERATOR || '/pricing'} className="text-red-800 underline font-semibold mt-2 inline-block">
                                         Upgrade to Pro for unlimited access →
                                     </a>
                                 )}

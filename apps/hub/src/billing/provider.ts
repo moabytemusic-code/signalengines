@@ -11,6 +11,7 @@ export interface UserEntitlement {
     tier: 'free' | 'pro';
     status: 'active' | 'cancelled' | 'past_due' | 'trialing' | 'expired';
     externalSubId: string;
+    engineId?: string;
 }
 
 export interface BillingProvider {

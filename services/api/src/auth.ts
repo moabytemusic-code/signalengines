@@ -66,7 +66,7 @@ export async function createSession(userId: string, res: Response) {
     res.cookie(SESSION_COOKIE, token, {
         httpOnly: true,
         secure: isProd,
-        sameSite: "lax",
+        sameSite: isProd ? "none" : "lax",
         domain: process.env.COOKIE_DOMAIN || (isProd ? ".signalengines.com" : undefined),
         expires: expiresAt
     });

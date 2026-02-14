@@ -69,19 +69,35 @@ export const gumroadProvider: BillingProvider = {
         const isCancelled = p.cancelled === 'true' || p.cancelled === true;
         const isEnded = p.ended === 'true' || p.ended === true;
 
-        // If cancelled but not ended, they might still be active until period end.
-        // However, for simplicity per requirements: "tier='free' on cancellation/expired"
-        // We will mark them as cancels immediately or let the webhook logic decide.
-
         let status: UserEntitlement['status'] = 'active';
         if (isEnded) status = 'expired';
         else if (isCancelled) status = 'cancelled';
+
+        // Map Gumroad Product ID to Engine ID
+        const productId = p.product_id;
+        let engineId: string | undefined;
+
+        // Mapping from Environment Variables
+        // You must set these in Vercel / .env.local
+        const PRODUCT_EMAIL = process.env.GUMROAD_PRODUCT_EMAIL_SEQUENCE_GENERATOR;
+        const PRODUCT_SEQUENCE = process.env.GUMROAD_PRODUCT_SEQUENCE_GENERATOR;
+
+        if (productId) {
+            if (productId === PRODUCT_EMAIL) {
+                engineId = 'email-sequence-generator';
+            } else if (productId === PRODUCT_SEQUENCE) {
+                engineId = 'sequence-generator';
+            } else {
+                console.warn(`Unknown Gumroad Product ID: ${productId}. Make sure to set GUMROAD_PRODUCT_... env vars.`);
+            }
+        }
 
         return {
             userEmail: p.email,
             tier: (status === 'active') ? 'pro' : 'free',
             status,
-            externalSubId: p.subscription_id || p.order_number
+            externalSubId: p.subscription_id || p.order_number,
+            engineId
         };
     }
 };

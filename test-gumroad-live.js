@@ -1,14 +1,8 @@
 
-import axios from 'axios';
-import crypto from 'crypto';
-import dotenv from 'dotenv';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-import path from 'path';
-
-// Fix for ESM __dirname
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const crypto = require('crypto');
+const fs = require('fs');
+const path = require('path');
+const dotenv = require('dotenv');
 
 // Load env vars
 dotenv.config({ path: path.join(__dirname, 'apps/hub/.env.local') });
@@ -19,10 +13,12 @@ const URL = 'https://hub.signalengines.com/api/webhooks/gumroad';
 
 if (!SECRET) {
     console.error('❌ GUMROAD_WEBHOOK_SECRET is missing from environment!');
-    // Allow pass if secret is manually provided? No.
+    // Attempt to run anyway if user passed it as arg?
     // process.exit(1);
-    throw new Error("Missing GUMROAD_WEBHOOK_SECRET");
+} else {
+    console.log('✅ Found GUMROAD_WEBHOOK_SECRET');
 }
+
 
 async function testGumroad() {
     const email = `test.gumroad.${Date.now()}@signalengines.com`;
@@ -32,7 +28,7 @@ async function testGumroad() {
     const payload = new URLSearchParams();
     payload.append('resource_id', 'sale_' + Date.now());
     payload.append('seller_id', 'user_' + Date.now());
-    payload.append('product_id', 'prod_test_123');
+    payload.append('product_id', 'prod_test_123'); // Ensure this ID is handled if needed
     payload.append('product_permalink', 'signalengines-pro');
     payload.append('short_product_id', 'test');
     payload.append('email', email);
@@ -48,31 +44,40 @@ async function testGumroad() {
     payload.append('order_number', '1001');
     payload.append('ip_country', 'US');
     payload.append('test', 'false'); // Critical: Treat as real sale
-    payload.append('resource_name', 'sale'); // Required by logic: payload.resource_name === 'sale'
-    // Also logic checks !is_recurring_charge for 'subscription_created'. 
-    // Usually 'sale' implies one-time unless recurrance set?
-    // Gumroad logic: if (payload.resource_name === 'sale' && !payload.is_recurring_charge) -> subscription_created
-    // Wait, create logic: !is_recurring_charge means it IS recurring? Or is NOT?
-    // Usually subscription_created happens on sale.
-    // Let's check gumroad.ts logic again later. Assuming we want to trigger CREATION.
+    payload.append('resource_name', 'sale');
 
     // Calculate Signature (HMAC SHA256 of RAW BODY STRING)
     const bodyString = payload.toString();
-    const signature = crypto.createHmac('sha256', SECRET!).update(bodyString).digest('hex');
+
+    let signature = '';
+    if (SECRET) {
+        signature = crypto.createHmac('sha256', SECRET).update(bodyString).digest('hex');
+    } else {
+        console.warn('⚠️  Signing with empty/dummy secret due to missing env var.');
+        signature = 'dummy';
+    }
 
     try {
-        const response = await axios.post(URL, bodyString, {
+        const response = await fetch(URL, {
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
                 'X-Gumroad-Signature': signature
-            }
+            },
+            body: bodyString
         });
 
-        console.log(`✅ Success: ${response.status}`);
-        console.log('Response:', response.data);
-    } catch (e: any) {
-        console.error(`❌ Error: ${e.response?.status} - ${JSON.stringify(e.response?.data)}`);
-        console.error('Message:', e.message);
+        const data = await response.text();
+
+        if (response.ok) {
+            console.log(`✅ Success: ${response.status}`);
+            console.log('Response:', data);
+        } else {
+            console.error(`❌ Error: ${response.status}`);
+            console.error('Response:', data);
+        }
+    } catch (e) {
+        console.error(`❌ Request Failed:`, e.message);
     }
 }
 
